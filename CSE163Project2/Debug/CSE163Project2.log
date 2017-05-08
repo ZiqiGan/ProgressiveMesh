@@ -1,0 +1,5 @@
+﻿  main.cpp
+c:\program files (x86)\windows kits\8.1\include\shared\minwindef.h(130): warning C4005: 'APIENTRY': macro redefinition
+  c:\users\chunc\onedrive\文档\visual studio 2015\projects\meshviewer\packages\glfw.3.2.1\build\native\include\glfw\glfw3.h(98): note: see previous definition of 'APIENTRY'
+  CSE163Project2.vcxproj -> C:\Users\chunc\OneDrive\文档\Visual Studio 2015\Projects\MeshViewer\Debug\CSE163Project2.exe
+  CSE163Project2.vcxproj -> C:\Users\chunc\OneDrive\文档\Visual Studio 2015\Projects\MeshViewer\Debug\CSE163Project2.pdb (Partial PDB)
