@@ -4,6 +4,7 @@
 #include <Windows.h>
 
 
+
 Mesh::Mesh(vector<Vertex> vertices, vector<GLuint> indices, vector<Texture> textures, Material mtl)
 {
 	this->vertices = vertices;
@@ -13,7 +14,7 @@ Mesh::Mesh(vector<Vertex> vertices, vector<GLuint> indices, vector<Texture> text
 	this->setupMesh();
 }
 
-void Mesh::Draw(Shader shader) {
+void Mesh::Draw(Shader shader,mat4 modelview) {
 	GLuint diffuseNr = 1;
 	GLuint specularNr = 1;
 
@@ -35,13 +36,26 @@ void Mesh::Draw(Shader shader) {
 	}
 
 	// Set material properties
-	glUniform3f(glGetUniformLocation(shader.Program, "material.ambient"), mtl.ambient.r, mtl.ambient.g, mtl.ambient.b);
-	glUniform3f(glGetUniformLocation(shader.Program, "material.diffuse"), mtl.diffuse.r, mtl.diffuse.g, mtl.diffuse.b);
-	glUniform3f(glGetUniformLocation(shader.Program, "material.specular"), mtl.specular.r, mtl.specular.g, mtl.specular.b); // Specular doesn't have full effect on this object's material
-	glUniform1f(glGetUniformLocation(shader.Program, "material.shininess"), mtl.shininess);
+	//glUniform3f(glGetUniformLocation(shader.Program, "material.ambient"), mtl.ambient.r, mtl.ambient.g, mtl.ambient.b);
+	//glUniform3f(glGetUniformLocation(shader.Program, "material.diffuse"), mtl.diffuse.r, mtl.diffuse.g, mtl.diffuse.b);
+	//glUniform3f(glGetUniformLocation(shader.Program, "material.specular"), mtl.specular.r, mtl.specular.g, mtl.specular.b); // Specular doesn't have full effect on this object's material
+	glUniform3f(glGetUniformLocation(shader.Program, "material.ambient"), 0.01f, 0.01f, 0.01f);
+	glUniform3f(glGetUniformLocation(shader.Program, "material.diffuse"), 0.4f, 0.4f, 0.4f);
+	glUniform3f(glGetUniformLocation(shader.Program, "material.specular"), 0.4f, 0.4f, 0.4f);
+	glUniform1f(glGetUniformLocation(shader.Program, "material.shininess"), 100.0f);
 
-	glUniform3f(glGetUniformLocation(shader.Program, "light.color"), 0.2f, 0.2f, 0.2f);
-	glUniform3f(glGetUniformLocation(shader.Program, "light.position"), 0.0f, -0.6f, 0.1f);
+	glUniform1d(glGetUniformLocation(shader.Program, "numLight"), 2);
+	glUniform3f(glGetUniformLocation(shader.Program, "light1.color"), 1.0f, 0.6f, 0.3f);
+	vec3 light1Pos = vec3(0.0f, 0.5f, 10.0f);
+	vec3 light2Pos = vec3(0.0f, 0.5f, -10.0f);
+	light1Pos = vec3(modelview*vec4(light1Pos,0));
+	light2Pos = vec3(modelview*vec4(light2Pos,0));
+
+	glUniform3f(glGetUniformLocation(shader.Program, "light1.position"), light1Pos[0], light1Pos[1], light1Pos[2]);
+
+
+	glUniform3f(glGetUniformLocation(shader.Program, "light2.color"), 1.0f, 0.0f, 0.3f);
+	glUniform3f(glGetUniformLocation(shader.Program, "light2.position"),light2Pos[0], light2Pos[1], light2Pos[2]);
 
 	glActiveTexture(GL_TEXTURE0);
 	glBindVertexArray(this->VAO);

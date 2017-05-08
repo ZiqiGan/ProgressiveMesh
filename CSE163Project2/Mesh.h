@@ -62,7 +62,7 @@ public:
 	vector<Texture> textures;
 	Material mtl;
 	Mesh(vector<Vertex> vectices, vector<GLuint> indices, vector<Texture> textures,Material mtl);
-	void Draw(Shader shader);
+	void Draw(Shader shader,mat4 modelview);
 	void setupMesh();
 
 private:

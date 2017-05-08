@@ -3,11 +3,11 @@
 #include <iostream>
 #include <Windows.h>
 
-void Model::Draw(Shader shader)
+void Model::Draw(Shader shader,mat4 modelview)
 {
 	for (GLuint i = 0; i < this->meshes.size(); i++)
 	{
-		this -> meshes[i].Draw(shader);
+		this -> meshes[i].Draw(shader,modelview);
 	}
 }
 

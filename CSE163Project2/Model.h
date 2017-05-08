@@ -9,7 +9,7 @@ public:
 	{
 		this->loadModel(path);
 	}
-	void Draw(Shader shader);
+	void Draw(Shader shader,mat4 modelview);
 private:
 	/*  Model Data  */
 	vector<Mesh> meshes;

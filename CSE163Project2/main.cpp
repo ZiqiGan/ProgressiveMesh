@@ -11,10 +11,10 @@ int main(int argc, char* argv[])
 	}
 
 	//set up camera position
-	vec3 eye = glm::vec3(0,0,5);
-	vec3 center = vec3(0, 0, 0);
-	vec3 up = vec3(0,1,0);
-	float fovy = 90.0f;
+	vec3 eye = glm::vec3(0,-4,4);
+	vec3 center = vec3(0, -1, 0);
+	vec3 up = vec3(0,1,1);
+	float fovy = 45.0f;
 	int width = 640;
 	int height = 480;
 	//set up perspective projection
@@ -50,7 +50,7 @@ int main(int argc, char* argv[])
 
 	while (!glfwWindowShouldClose(window))
 	{
-		glClearColor(1, 1, 1, 1);
+		glClearColor(0, 0, 1, 0);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 		//render the object
 		myScene.render(projection, modelView);
