@@ -31,17 +31,31 @@ using glm::vec4;
 using glm::quat;
 using namespace std;
 
+//reference:https://www.openmesh.org/Daily-Builds/Doc/a00016.html
+struct HalfEdge {
+	HalfEdge* nextHE;
+	HalfEdge* prevHE;
+	HalfEdge* oppoHE;
+	Face* face;
+	Vertex* vertex;
+	HalfEdge() {
+		nextHE = prevHE = oppoHE = NULL;
+		face = NULL;
+		vertex = NULL;
+	}
+}
+
+
+//define vertex structure
 struct Vertex {
 	glm::vec3 Position;
 	glm::vec3 Normal;
-	glm::vec2 TexCoords;
+	HalfEdge* outHE;
+
+	
 };
 
-struct Texture {
-	GLuint id;
-	string type;
-};
-
+//define Material structure
 struct Material {
 	aiColor3D ambient;
 	aiColor3D diffuse;
@@ -49,6 +63,12 @@ struct Material {
 	float shininess = 0;
 };
 
+struct Face {
+	HalfEdge* boudingHE;
+	vec3 normal;
+	
+};
+//define Light Structure
 struct Light {
 	vec3 position;
 	vec3 color;
@@ -59,12 +79,12 @@ class Mesh
 public:
 	vector<Vertex> vertices;
 	vector<GLuint> indices;
-	vector<Texture> textures;
 	Material mtl;
-	Mesh(vector<Vertex> vectices, vector<GLuint> indices, vector<Texture> textures,Material mtl);
+	Mesh();
+	Mesh(vector<Vertex> vectices, vector<GLuint> indices,Material mtl);
 	void Draw(Shader shader,mat4 modelview);
 	void setupMesh();
-
+	Mesh createFlatMesh();
 private:
 	GLuint VAO, VBO, EBO;
 

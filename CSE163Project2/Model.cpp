@@ -7,7 +7,9 @@ void Model::Draw(Shader shader,mat4 modelview)
 {
 	for (GLuint i = 0; i < this->meshes.size(); i++)
 	{
-		this -> meshes[i].Draw(shader,modelview);
+		Mesh flatMesh = meshes[i].createFlatMesh();
+		//this -> meshes[i].Draw(shader,modelview);
+		flatMesh.Draw(shader, modelview);
 	}
 }
 
@@ -60,10 +62,7 @@ Mesh Model::processMesh(aiMesh * mesh, const aiScene * scene)
 		vector.y = mesh->mVertices[i].y;
 		vector.z = mesh->mVertices[i].z;
 		vertex.Position = vector;
-		//vertex.Position = vec3(0.5f, 0.5f, 0.5f);
-		//char buff[100];
-		//sprintf_s(buff, "%f,%f,%f\n",vector.x,vector.y,vector.z);
-		//OutputDebugString(buff);
+
 		////normal 
 		vec3 normal = glm::normalize(vector);
 		//vector.x = mesh->mNormals[i].x;
@@ -71,6 +70,8 @@ Mesh Model::processMesh(aiMesh * mesh, const aiScene * scene)
 		//vector.z = mesh->mNormals[i].z;
 		vertex.Normal = normal;
 		vertices.push_back(vertex);
+
+		//faces
 
 		//texture
 		if (mesh->mTextureCoords[0]) // Does the mesh contain texture coordinates?

@@ -5,11 +5,14 @@
 
 
 
-Mesh::Mesh(vector<Vertex> vertices, vector<GLuint> indices, vector<Texture> textures, Material mtl)
+Mesh::Mesh()
+{
+}
+
+Mesh::Mesh(vector<Vertex> vertices, vector<GLuint> indices, Material mtl)
 {
 	this->vertices = vertices;
 	this->indices = indices;
-	this->textures = textures;
 	this->mtl = mtl;
 	this->setupMesh();
 }
@@ -18,27 +21,6 @@ void Mesh::Draw(Shader shader,mat4 modelview) {
 	GLuint diffuseNr = 1;
 	GLuint specularNr = 1;
 
-	for (GLuint i = 0; i < this->textures.size(); i++)
-	{
-		glActiveTexture(GL_TEXTURE0 + i); // Activate proper texture unit before binding
-										  // Retrieve texture number (the N in diffuse_textureN)
-		stringstream ss;
-		string number;
-		string name = this->textures[i].type;
-		if (name == "texture_diffuse")
-			ss << diffuseNr++; // Transfer GLuint to stream
-		else if (name == "texture_specular")
-			ss << specularNr++; // Transfer GLuint to stream
-		number = ss.str();
-
-		glUniform1f(glGetUniformLocation(shader.Program, ("material." + name + number).c_str()), i);
-		glBindTexture(GL_TEXTURE_2D, this->textures[i].id);
-	}
-
-	// Set material properties
-	//glUniform3f(glGetUniformLocation(shader.Program, "material.ambient"), mtl.ambient.r, mtl.ambient.g, mtl.ambient.b);
-	//glUniform3f(glGetUniformLocation(shader.Program, "material.diffuse"), mtl.diffuse.r, mtl.diffuse.g, mtl.diffuse.b);
-	//glUniform3f(glGetUniformLocation(shader.Program, "material.specular"), mtl.specular.r, mtl.specular.g, mtl.specular.b); // Specular doesn't have full effect on this object's material
 	glUniform3f(glGetUniformLocation(shader.Program, "material.ambient"), 0.01f, 0.01f, 0.01f);
 	glUniform3f(glGetUniformLocation(shader.Program, "material.diffuse"), 0.4f, 0.4f, 0.4f);
 	glUniform3f(glGetUniformLocation(shader.Program, "material.specular"), 0.4f, 0.4f, 0.4f);
@@ -97,6 +79,35 @@ void Mesh::setupMesh()
 		(GLvoid*)offsetof(Vertex, TexCoords));
 	glBindVertexArray(0);
 
+}
+
+Mesh Mesh::createFlatMesh()
+{
+	Mesh flatMesh;
+	int indexCount = this->indices.size();
+	flatMesh.vertices = vector<Vertex>(indexCount);
+	flatMesh.indices = vector<GLuint>(indexCount);
+	for (int i = 0; i < indexCount; i+=3)
+	{
+		Vertex vert1 = this->vertices[this->indices[i]];
+		Vertex vert2 = this->vertices[this->indices[i+1]];
+		Vertex vert3 = this->vertices[this->indices[i+2]];
+
+		flatMesh.vertices[i] = vert1;
+		flatMesh.vertices[i + 1] = vert2;
+		flatMesh.vertices[i + 2] = vert3;
+
+		flatMesh.indices[i] = i;
+		flatMesh.indices[i + 1] = i + 1;
+		flatMesh.indices[i + 2] = i + 2;
+	}
+	for (int i = 0; i < indexCount; i++)
+	{
+		vec3 normal = glm::normalize(flatMesh.vertices[i].Position);
+		flatMesh.vertices[i].Normal = normal;
+	}
+	flatMesh.mtl = this->mtl;
+	return flatMesh;
 }
 
 

@@ -13,6 +13,7 @@ public:
 private:
 	/*  Model Data  */
 	vector<Mesh> meshes;
+	
 	string directory;
 	/*  Functions   */
 	void loadModel(string path);

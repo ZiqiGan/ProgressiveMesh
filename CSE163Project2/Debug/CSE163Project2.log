@@ -1,4 +1,4 @@
 ﻿  Mesh.cpp
-c:\users\chunc\onedrive\文档\visual studio 2015\projects\meshviewer\cse163project2\mesh.cpp(34): warning C4244: 'argument': conversion from 'GLuint' to 'GLfloat', possible loss of data
+c:\users\chunc\onedrive\文档\visual studio 2015\projects\meshviewer\cse163project2\mesh.cpp(38): warning C4244: 'argument': conversion from 'GLuint' to 'GLfloat', possible loss of data
   CSE163Project2.vcxproj -> C:\Users\chunc\OneDrive\文档\Visual Studio 2015\Projects\MeshViewer\Debug\CSE163Project2.exe
   CSE163Project2.vcxproj -> C:\Users\chunc\OneDrive\文档\Visual Studio 2015\Projects\MeshViewer\Debug\CSE163Project2.pdb (Partial PDB)
