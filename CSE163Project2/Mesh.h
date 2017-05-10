@@ -37,11 +37,16 @@ struct HalfEdge {
 	HalfEdge* prevHE;
 	HalfEdge* oppoHE;
 	Face* face;
+	//vertex that the halfedge points to
 	Vertex* vertex;
 	HalfEdge() {
 		nextHE = prevHE = oppoHE = NULL;
 		face = NULL;
 		vertex = NULL;
+	}
+	HalfEdge(Vertex* vertIn)
+	{
+		this->vertex = vertIn;
 	}
 }
 
@@ -50,9 +55,13 @@ struct HalfEdge {
 struct Vertex {
 	glm::vec3 Position;
 	glm::vec3 Normal;
+	//each vertex references one outgoing halfedge
 	HalfEdge* outHE;
-
-	
+	Vertex() {};
+	Vertex(vec3 position) {
+		this->Position = position;
+		this->Normal = glm::normalize(position);
+	}
 };
 
 //define Material structure
@@ -64,9 +73,16 @@ struct Material {
 };
 
 struct Face {
-	HalfEdge* boudingHE;
+	//each face references one of the halfedges bounding it
+	HalfEdge* boundingHE[3];
 	vec3 normal;
-	
+	Face() {};
+	Face(Vertex* vertex1, Vertex* vertex2, Vertex* vertex3)
+	{
+		boundingHE[0] = new HalfEdge(vertex1);
+		boundingHE[1] = new HalfEdge(vertex2);
+		boundingHE[2] = new HalfEdge(vertex3);
+	}	
 };
 //define Light Structure
 struct Light {
@@ -77,14 +93,18 @@ struct Light {
 class Mesh
 {
 public:
-	vector<Vertex> vertices;
-	vector<GLuint> indices;
+	vector<Vertex*> vertices;
+	vector<Face*> faces;
+	int numVertics;
+	int numFaces;
 	Material mtl;
 	Mesh();
-	Mesh(vector<Vertex> vectices, vector<GLuint> indices,Material mtl);
-	void Draw(Shader shader,mat4 modelview);
+	//TODO: determine what constructor should be
+	///Mesh(vector<Vertex> vectices,Material mtl);
+	void readFile(const char* filename);
+	void processMesh();
 	void setupMesh();
-	Mesh createFlatMesh();
+	void Draw(Shader shader,mat4 modelview);
 private:
 	GLuint VAO, VBO, EBO;
 

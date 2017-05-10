@@ -2,20 +2,104 @@
 #include <iostream>
 #include <sstream>
 #include <Windows.h>
+#include <fstream>
 
 
+bool readvals(stringstream &s, const int numvals, GLfloat* values)
+{
+	for (int i = 0; i < numvals; i++)
+	{
+		s >> values[i];
+		if (s.fail())
+		{
+			cout << "Failed reading value " << i << "will skip\n";
+			return false;
+		}
+	}
+	return true;
+}
 
 Mesh::Mesh()
 {
 }
 
-Mesh::Mesh(vector<Vertex> vertices, vector<GLuint> indices, Material mtl)
+
+//using the reading file function simillar to the final project in CSE167
+void Mesh::readFile(const char* filename)
 {
-	this->vertices = vertices;
-	this->indices = indices;
-	this->mtl = mtl;
-	this->setupMesh();
+	string str, cmd;
+	ifstream in;
+	in.open(filename);
+	if (in.is_open())
+	{
+		getline(in, str);
+		int lineCount = 0;
+		int vertexCount = 0;
+		int faceCount = 0;
+		while (in)
+		{
+			if ((str.find_first_not_of(" \t\r\n") != string::npos) && (str[0] != '#'))
+			{
+				bool validinput;
+				stringstream s(str);
+				
+
+				//first line
+				if (lineCount == 0)
+				{
+					lineCount++;
+					continue;
+				}
+				//second line
+				else if(lineCount == 1)
+				{
+					GLfloat values[3];
+					validinput = readvals(s, 3, values);
+					if(validinput){
+						vertexCount = values[0];
+						numFaces = values[1];
+						this->numVertics = values[0];
+						this->numFaces = values[1];
+					}
+					else {
+						break;
+					}
+					lineCount++;
+				}
+				//read in all the vertics
+				else if ((lineCount > 1) && (lineCount < vertexCount + 2))
+				{
+					GLfloat values[3];
+					validinput = readvals(s, 3, values);
+					if (validinput) {
+						vec3 vertPos = vec3(values[0], values[1], values[2]);
+						this->vertices.push_back(new Vertex(vertPos));
+						
+					}
+				}
+				//read in all the faces
+				else
+				{
+					GLfloat values[4];
+					validinput = readvals(s, 3, values);
+					if (validinput) {
+						Face* face = new Face(this->vertices[values[0]],
+							this->vertices[values[0]], this->vertices[values[0]]);
+						
+						this->faces.push_back(face);
+
+					
+					}
+				}
+				
+			}
+		}
+	}
 }
+
+
+
+
 
 void Mesh::Draw(Shader shader,mat4 modelview) {
 	GLuint diffuseNr = 1;
@@ -46,6 +130,10 @@ void Mesh::Draw(Shader shader,mat4 modelview) {
 	glBindVertexArray(0);
 }
 
+
+void Mesh::processMesh()
+{
+}
 
 void Mesh::setupMesh()
 {
@@ -81,33 +169,6 @@ void Mesh::setupMesh()
 
 }
 
-Mesh Mesh::createFlatMesh()
-{
-	Mesh flatMesh;
-	int indexCount = this->indices.size();
-	flatMesh.vertices = vector<Vertex>(indexCount);
-	flatMesh.indices = vector<GLuint>(indexCount);
-	for (int i = 0; i < indexCount; i+=3)
-	{
-		Vertex vert1 = this->vertices[this->indices[i]];
-		Vertex vert2 = this->vertices[this->indices[i+1]];
-		Vertex vert3 = this->vertices[this->indices[i+2]];
 
-		flatMesh.vertices[i] = vert1;
-		flatMesh.vertices[i + 1] = vert2;
-		flatMesh.vertices[i + 2] = vert3;
-
-		flatMesh.indices[i] = i;
-		flatMesh.indices[i + 1] = i + 1;
-		flatMesh.indices[i + 2] = i + 2;
-	}
-	for (int i = 0; i < indexCount; i++)
-	{
-		vec3 normal = glm::normalize(flatMesh.vertices[i].Position);
-		flatMesh.vertices[i].Normal = normal;
-	}
-	flatMesh.mtl = this->mtl;
-	return flatMesh;
-}
 
 
