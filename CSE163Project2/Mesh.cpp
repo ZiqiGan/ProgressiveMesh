@@ -58,6 +58,7 @@ void Mesh::readFile(const char* filename)
 					if(validinput){
 						vertexCount = values[0];
 						numFaces = values[1];
+						//pass in the number of vertics and faces
 						this->numVertics = values[0];
 						this->numFaces = values[1];
 					}
@@ -73,7 +74,8 @@ void Mesh::readFile(const char* filename)
 					validinput = readvals(s, 3, values);
 					if (validinput) {
 						vec3 vertPos = vec3(values[0], values[1], values[2]);
-						this->vertices.push_back(new Vertex(vertPos));
+						//push in a new vertex
+						this->vertices.push_back(new Vertex(vertPos,lineCount-2));
 						
 					}
 				}
@@ -83,21 +85,74 @@ void Mesh::readFile(const char* filename)
 					GLfloat values[4];
 					validinput = readvals(s, 3, values);
 					if (validinput) {
+						//create the face with three vertices
 						Face* face = new Face(this->vertices[values[0]],
 							this->vertices[values[0]], this->vertices[values[0]]);
-						
-						this->faces.push_back(face);
-
 					
+						//calculate the face normal 
+						vec3 edge1 = face->adjVertices[0]->Position - face->adjVertices[1]->Position;
+						vec3 edge2 = face->adjVertices[2]->Position - face->adjVertices[1]->Position;
+						vec3 faceNormal = glm::cross(edge1, edge2);
+						face->normal = faceNormal;
+						this->faces.push_back(face);
+						
+						//push the current face to the adjacency list of its vertices
+						vertices[values[0]]->adjFaces.push_back(face);
+						vertices[values[1]]->adjFaces.push_back(face);
+						vertices[values[2]]->adjFaces.push_back(face);
+
 					}
 				}
-				
 			}
 		}
 	}
 }
 
+bool isFaceAdj(Face* face1, Face* face2)
+{
+	int sharedVertex = 0;
+	for (int i = 0; i < 3; i++)
+	{
+		for (int j = 0; j < 3; j++)
+		{
+			if (face1->adjVertices[i]->id == face2->adjVertices[j]->id)
+			{
+				sharedVertex++;
+			}
+		}
+	}
+	if(sharedVertex > 2)
+	{
+		return true;
+	}
+	else
+	{
+		return false;
+	}
+}
+//create adjacent relationships for vertics, faces and edges
+void Mesh::processMesh()
+{
+	//process face adjancent relationship
+	for (int i = 0; i < numFaces; i++)
+	{
+		Face* currFace = faces[i];
+		for (int i = 0; i < 3; i++)
+		{
+			Vertex* currVx = currFace->adjVertices[i];
+			for (int i = 0; i < currVx->adjFaces.size; i++)
+			{
+				if (isFaceAdj(currFace, currVx->adjFaces[i]))
+				{
+					currFace->adjFaces.push_back(currVx->adjFaces[i]);
+				}
+			}
+		}
+	}
 
+
+
+}
 
 
 
@@ -125,15 +180,13 @@ void Mesh::Draw(Shader shader,mat4 modelview) {
 
 	glActiveTexture(GL_TEXTURE0);
 	glBindVertexArray(this->VAO);
-	glDrawElements(GL_TRIANGLES, this->indices.size(), GL_UNSIGNED_INT, 0);
+	//glDrawElements(GL_TRIANGLES, this->indices.size(), GL_UNSIGNED_INT, 0);
 
 	glBindVertexArray(0);
 }
 
 
-void Mesh::processMesh()
-{
-}
+
 
 void Mesh::setupMesh()
 {
@@ -161,11 +214,6 @@ void Mesh::setupMesh()
 	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex),
 		(GLvoid*)offsetof(Vertex, Normal));
 
-	// Vertex Texture Coords
-	glEnableVertexAttribArray(2);
-	glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex),
-		(GLvoid*)offsetof(Vertex, TexCoords));
-	glBindVertexArray(0);
 
 }
 
