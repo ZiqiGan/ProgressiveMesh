@@ -51,6 +51,11 @@ struct Edge {
 	vector<Vertex*> adjVertices;
 	vector<Face*> adjFaces;
 	vector<Edge*> adjEdges;
+	Edge(Vertex* vt1, Vertex* vt2)
+	{
+		adjVertices.push_back(vt1);
+		adjVertices.push_back(vt2);
+	}
 
 };
 

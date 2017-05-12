@@ -101,6 +101,13 @@ void Mesh::readFile(const char* filename)
 						vertices[values[1]]->adjFaces.push_back(face);
 						vertices[values[2]]->adjFaces.push_back(face);
 
+						//adj vertex for vertex
+						vertices[values[0]]->adjVertices.push_back(vertices[values[1]]);
+						vertices[values[0]]->adjVertices.push_back(vertices[values[2]]);
+						vertices[values[1]]->adjVertices.push_back(vertices[values[0]]);
+						vertices[values[1]]->adjVertices.push_back(vertices[values[2]]);
+						vertices[values[2]]->adjVertices.push_back(vertices[values[0]]);
+						vertices[values[2]]->adjVertices.push_back(vertices[values[1]]);
 					}
 				}
 			}
@@ -108,6 +115,8 @@ void Mesh::readFile(const char* filename)
 	}
 }
 
+
+//determine if two faces are dajacent by checking if they share two same vertices
 bool isFaceAdj(Face* face1, Face* face2)
 {
 	int sharedVertex = 0;
@@ -130,6 +139,7 @@ bool isFaceAdj(Face* face1, Face* face2)
 		return false;
 	}
 }
+
 //create adjacent relationships for vertics, faces and edges
 void Mesh::processMesh()
 {
@@ -137,19 +147,86 @@ void Mesh::processMesh()
 	for (int i = 0; i < numFaces; i++)
 	{
 		Face* currFace = faces[i];
-		for (int i = 0; i < 3; i++)
+		for (int j = 0; j < 3; i++)
 		{
-			Vertex* currVx = currFace->adjVertices[i];
-			for (int i = 0; i < currVx->adjFaces.size; i++)
+			Vertex* currVx = currFace->adjVertices[j];
+			for (int k = 0; k < currVx->adjFaces.size; k++)
 			{
-				if (isFaceAdj(currFace, currVx->adjFaces[i]))
+				//check if two faces are adjacent
+				if (isFaceAdj(currFace, currVx->adjFaces[k]))
 				{
-					currFace->adjFaces.push_back(currVx->adjFaces[i]);
+					currFace->adjFaces.push_back(currVx->adjFaces[k]);
 				}
 			}
 		}
 	}
 
+	//process edge adjacency relationship
+	for (int i = 0; i < numFaces; i++)
+	{
+		Face* currFace = faces[i];
+		for (int j = 0; j < 3; j++)
+		{
+			//each face is assoicated with three edges
+			
+		/*	currFace->adjVertices[0]->adjVertices.push_back(currFace->adjVertices[1]);
+			currFace->adjVertices[0]->adjVertices.push_back(currFace->adjVertices[2]);
+			currFace->adjVertices[1]->adjVertices.push_back(currFace->adjVertices[0]);
+			currFace->adjVertices[1]->adjVertices.push_back(currFace->adjVertices[2]);
+			currFace->adjVertices[2]->adjVertices.push_back(currFace->adjVertices[1]);
+			currFace->adjVertices[2]->adjVertices.push_back(currFace->adjVertices[0]);*/
+
+			
+			Edge* edge1 = new Edge(currFace->adjVertices[0], currFace->adjVertices[1]);
+			//adj face for edge
+			edge1->adjFaces.push_back(currFace);
+			this->edges.push_back(edge1);
+			
+			Edge* edge2 = new Edge(currFace->adjVertices[1], currFace->adjVertices[2]);
+			edge2->adjFaces.push_back(currFace);
+			this->edges.push_back(edge2);
+			
+			Edge* edge3 = new Edge(currFace->adjVertices[2], currFace->adjVertices[0]);
+			edge3->adjFaces.push_back(currFace);
+			this->edges.push_back(edge3);
+			
+			//adj edge for edge
+			edge1->adjEdges.push_back(edge2);
+			edge1->adjEdges.push_back(edge3);
+			edge2->adjEdges.push_back(edge1);
+			edge2->adjEdges.push_back(edge3);
+			edge3->adjEdges.push_back(edge1);
+			edge3->adjEdges.push_back(edge2);
+
+			//adj edge for vertex
+			currFace->adjVertices[0]->adjEdges.push_back(edge1);
+			currFace->adjVertices[0]->adjEdges.push_back(edge3);
+			currFace->adjVertices[1]->adjEdges.push_back(edge1);
+			currFace->adjVertices[1]->adjEdges.push_back(edge2);
+			currFace->adjVertices[2]->adjEdges.push_back(edge2);
+			currFace->adjVertices[2]->adjEdges.push_back(edge3);
+			
+			//adj edge for face
+			currFace->adjEdges[0] = edge1;
+			currFace->adjEdges[1] = edge2;
+			currFace->adjEdges[2] = edge3;
+		}
+	}
+
+	/* per-vertex normals: 
+	 * average normal of faces touching each vertex
+	 */
+	for (int i = 0; i < numVertics; i++)
+	{
+		vec3 normal = vec3(0, 0, 0);
+		for (int j = 0; j < vertices[i]->adjFaces.size(); j++)
+		{
+			normal = normal + vertices[i]->adjFaces[j]->normal;
+		}
+		normal = glm::normalize(normal);
+		vertices[i]->Normal = normal;
+	}
+	
 
 
 }
