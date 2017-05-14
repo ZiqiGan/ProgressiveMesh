@@ -4,6 +4,7 @@
 
 #include <stdlib.h>
 #include <vector> 
+
 #include <glm/glm.hpp>
 #include <glm/gtc/noise.hpp>
 #include <glm/gtx/rotate_vector.hpp>
@@ -31,6 +32,9 @@ using glm::vec4;
 using glm::quat;
 using namespace std;
 
+struct Vertex;
+struct Edge;
+struct Face;
 //define vertex structure
 struct Vertex {
 	glm::vec3 Position;
@@ -67,9 +71,9 @@ struct Face {
 	vector<Edge*> adjEdges;
 	Face(Vertex* vertex1, Vertex* vertex2, Vertex* vertex3)
 	{
-		adjVertices[0] = vertex0;
-		adjVertices[1] = vertex1;
-		adjVertices[2] = vertex2;
+		adjVertices[0] = vertex1;
+		adjVertices[1] = vertex2;
+		adjVertices[2] = vertex3;
 	}
 };
 
@@ -93,18 +97,21 @@ public:
 	vector<Vertex*> vertices;
 	vector<Face*> faces;
 	vector<Edge*> edges;
-	int numVertics;
-	int numFaces;
-	int numEdges;
+	vector<vec3> vtPos;
+	vector<vec3> vtNorms;
+	vector<vec3> faceNorms;
+	vector<GLuint> indices;
+	int numVertics = 0;
+	int numFaces = 0;
+	int numEdges = 0;
 	Material mtl;
-	Mesh();
-	
+	Mesh();   
 	void readFile(const char* filename);
 	void processMesh();
-	void setupMesh();
+	void setupMesh(); 
 	void Draw(Shader shader,mat4 modelview);
 private:
-	GLuint VAO, VBO, EBO;
+	GLuint VAO, VBO,NBO, EBO;
 
 };
 

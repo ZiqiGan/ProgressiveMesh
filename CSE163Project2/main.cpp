@@ -11,9 +11,9 @@ int main(int argc, char* argv[])
 	}
 
 	//set up camera position
-	vec3 eye = glm::vec3(0,-4,4);
+	vec3 eye = glm::vec3(0, -4, 4);
 	vec3 center = vec3(0, -1, 0);
-	vec3 up = vec3(0,1,1);
+	vec3 up = vec3(0, 1, 1);
 	float fovy = 45.0f;
 	int width = 640;
 	int height = 480;
@@ -41,18 +41,26 @@ int main(int argc, char* argv[])
 	glViewport(0, 0, width, height);
 
 	// OpenGL options
-	glEnable(GL_DEPTH_TEST);
+	glEnable(GL_DEPTH_TEST);	
+	glfwSetInputMode(window, GLFW_STICKY_KEYS, GL_TRUE);
+	// Hide the mouse and enable unlimited mouvement
+	glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+	if (glfwGetKey(window, GLFW_KEY_F1) == GLFW_PRESS)
+	{
+		char buff[100];
+		sprintf_s(buff, "Finsh Loading/n");
+		OutputDebugString(buff);
+	}
 	Scene myScene = Scene(argv[1]);
+	myScene.setupScene();
 
-	char buff[100];
-	sprintf_s(buff,"Finsh Loading/n");
-	OutputDebugString(buff);
-
-	while (!glfwWindowShouldClose(window))
+	while (glfwGetKey(window, GLFW_KEY_ESCAPE) != GLFW_PRESS && !glfwWindowShouldClose(window))
 	{
 		glClearColor(0, 0, 1, 0);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 		//render the object
+		glfwPollEvents();
+
 		myScene.render(projection, modelView);
 		glfwSwapBuffers(window);
 	}
