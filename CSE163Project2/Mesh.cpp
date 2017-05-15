@@ -262,15 +262,15 @@ void Mesh::Draw(Shader shader,mat4 modelview) {
 	GLuint diffuseNr = 1;
 	GLuint specularNr = 1;
 	
-	glUniform3f(glGetUniformLocation(shader.Program, "material.ambient"), 0.01f, 0.01f, 0.01f);
-	glUniform3f(glGetUniformLocation(shader.Program, "material.diffuse"), 0.4f, 0.4f, 0.4f);
-	glUniform3f(glGetUniformLocation(shader.Program, "material.specular"), 0.6f, 0.6f, 0.5f);
-	glUniform1f(glGetUniformLocation(shader.Program, "material.shininess"), 100.0f);
+	glUniform3f(glGetUniformLocation(shader.Program, "material.ambient"), 0.2f, 0.2f, 0.2f);
+	glUniform3f(glGetUniformLocation(shader.Program, "material.diffuse"), 0.5f, 0.5f, 0.5f);
+	glUniform3f(glGetUniformLocation(shader.Program, "material.specular"), 1.0f, 1.0f, 1.0f);
+	glUniform1f(glGetUniformLocation(shader.Program, "material.shininess"), 20.0f);
 
 	
 	
 	glUniform1d(glGetUniformLocation(shader.Program, "numLight"), 2);
-	glUniform3f(glGetUniformLocation(shader.Program, "light1.color"), 0.8f, 0.6f, 0.7f);
+	glUniform3f(glGetUniformLocation(shader.Program, "light1.color"), 1.0f, 0.5f, 0.0f);
 	vec3 light1Pos = vec3(0.0f, 5.0f, 10.0f);
 	vec3 light2Pos = vec3(0.0f, -5.0f, 10.0f);
 	light1Pos = vec3(modelview*vec4(light1Pos,0));
@@ -279,15 +279,44 @@ void Mesh::Draw(Shader shader,mat4 modelview) {
 	glUniform3f(glGetUniformLocation(shader.Program, "light1.position"), light1Pos[0], light1Pos[1], light1Pos[2]);
 
 
-	glUniform3f(glGetUniformLocation(shader.Program, "light2.color"), 0.8f, 0.6f, 0.6f);
+	glUniform3f(glGetUniformLocation(shader.Program, "light2.color"), 0.5f, 0.5f, 1.0f);
 	glUniform3f(glGetUniformLocation(shader.Program, "light2.position"),light2Pos[0], light2Pos[1], light2Pos[2]);
 	glBindVertexArray(this->VAO);
-	//glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+	glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 	
 	glDrawElements(GL_TRIANGLES, this->indices.size(), GL_UNSIGNED_INT, 0);
 
 }
 
+void Mesh::edgeCollapse(Edge* edge)
+{	
+	Vertex* vt0 = edge->adjVertices[0];
+	Vertex* vt1 = edge->adjVertices[1];
 
+	//create the new vertex on the edge
+	vec3 newPos = (vt0->Position + vt1->Position) * 0.5f;
+	Vertex* toInsert = new Vertex(newPos);
+	this->vertices.push_back(toInsert);
+	this->numVertics = this->numVertics - 1;
+
+	//process all faces neighboring to vertex 0
+	for (int i = 0; i < vt0->adjFaces.size(); i++)
+	{
+		Face* currFace = vt0->adjFaces[i];
+		for (int j = 0; j < 3; j++)
+		{
+			if (currFace->adjVertices[j]->id == vt0->id)
+			{
+				currFace->adjVertices[j] = toInsert;
+			}
+		}
+	}
+	//process all faces neighboring to vertex 1
+	for (int i = 0; i < vt1->adjFaces.size(); i++)
+	{
+
+	}
+
+}
 
 

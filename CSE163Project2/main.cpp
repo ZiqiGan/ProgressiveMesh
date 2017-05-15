@@ -116,7 +116,7 @@ int main(int argc, char* argv[])
 		else if (glfwGetKey(window, GLFW_KEY_I) == GLFW_PRESS)
 		{
 			//sc += 0.0005;
-			sc += 1.0f;
+			sc += 0.3f;
 		}
 		else if (glfwGetKey(window, GLFW_KEY_O) == GLFW_PRESS)
 		{

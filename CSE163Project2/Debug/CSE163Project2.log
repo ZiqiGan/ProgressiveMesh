@@ -1,3 +1,5 @@
 ﻿  Mesh.cpp
+c:\users\chunc\desktop\coursework\cse\cse163\assignment2\cse163hw2\cse163project2\mesh.cpp(303): warning C4018: '<': signed/unsigned mismatch
+c:\users\chunc\desktop\coursework\cse\cse163\assignment2\cse163hw2\cse163project2\mesh.cpp(315): warning C4018: '<': signed/unsigned mismatch
   CSE163Project2.vcxproj -> C:\Users\chunc\Desktop\Coursework\CSE\CSE163\Assignment2\CSE163HW2\Debug\CSE163Project2.exe
   CSE163Project2.vcxproj -> C:\Users\chunc\Desktop\Coursework\CSE\CSE163\Assignment2\CSE163HW2\Debug\CSE163Project2.pdb (Partial PDB)

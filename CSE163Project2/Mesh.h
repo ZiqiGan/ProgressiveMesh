@@ -49,6 +49,10 @@ struct Vertex {
 		this->Position = pos;
 		this->id = id;
 	}
+	Vertex(vec3 pos)
+	{
+		this->Position = pos;
+	}
 };
 
 struct Edge {
@@ -110,6 +114,7 @@ public:
 	void processMesh();
 	void setupMesh(); 
 	void Draw(Shader shader,mat4 modelview);
+	void edgeCollapse(Edge * edge);
 private:
 	GLuint VAO, VBO,NBO, EBO;
 
