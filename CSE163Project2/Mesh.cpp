@@ -202,6 +202,7 @@ void Mesh::processMesh()
 	/* per-vertex normals: 
 	 * average normal of faces touching each vertex
 	 */
+	
 	for (int i = 0; i < numVertics; i++)
 	{
 		vec3 normal = vec3(0, 0, 0);
@@ -209,6 +210,7 @@ void Mesh::processMesh()
 		{
 			normal = normal + vertices[i]->adjFaces[j]->normal;
 		}
+		
 		normal = glm::normalize(normal);
 		vertices[i]->Normal = normal;
 		this->vtNorms.push_back(normal);
@@ -269,8 +271,8 @@ void Mesh::Draw(Shader shader,mat4 modelview) {
 	
 	glUniform1d(glGetUniformLocation(shader.Program, "numLight"), 2);
 	glUniform3f(glGetUniformLocation(shader.Program, "light1.color"), 0.8f, 0.6f, 0.7f);
-	vec3 light1Pos = vec3(0.5f, 0.0f, 1.0f);
-	vec3 light2Pos = vec3(0.5f, -5.0f, 1.0f);
+	vec3 light1Pos = vec3(0.0f, 5.0f, 10.0f);
+	vec3 light2Pos = vec3(0.0f, -5.0f, 10.0f);
 	light1Pos = vec3(modelview*vec4(light1Pos,0));
 	light2Pos = vec3(modelview*vec4(light2Pos,0));
 
@@ -279,7 +281,6 @@ void Mesh::Draw(Shader shader,mat4 modelview) {
 
 	glUniform3f(glGetUniformLocation(shader.Program, "light2.color"), 0.8f, 0.6f, 0.6f);
 	glUniform3f(glGetUniformLocation(shader.Program, "light2.position"),light2Pos[0], light2Pos[1], light2Pos[2]);
-	//glShadeModel(GL_FLAT);
 	glBindVertexArray(this->VAO);
 	//glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 	

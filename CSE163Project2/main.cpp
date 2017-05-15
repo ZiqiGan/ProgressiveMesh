@@ -1,7 +1,9 @@
 #include "Scene.h"
+#include "Transform.h"
 #include <iostream>
 #include <GLFW/glfw3.h>
 #include <Windows.h>
+
 int main(int argc, char* argv[])
 {
 	if (argc < 2)
@@ -10,24 +12,14 @@ int main(int argc, char* argv[])
 		exit(-1);
 	}
 
-	//set up camera position
-	vec3 eye = glm::vec3(0, -4, 4);
-	vec3 center = vec3(0, -1, 0);
-	vec3 up = vec3(0, 1, 1);
-	float fovy = 45.0f;
-	int width = 640;
-	int height = 480;
-	//set up perspective projection
-	float aspect = (float)width / (float)height, zNear = 0.1f, zFar = 99.0f;
-	mat4 projection = glm::perspective(glm::radians(fovy), aspect, zNear, zFar);
-	mat4 modelView = glm::lookAt(eye, center, up);
 
 	glfwInit();
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
 	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 	glfwWindowHint(GLFW_RESIZABLE, GL_FALSE);
-
+	int width = 640;
+	int height = 480;
 	GLFWwindow* window = glfwCreateWindow(width, height, "MeshViewer", nullptr, nullptr);
 	glfwMakeContextCurrent(window);
 	glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
@@ -40,6 +32,14 @@ int main(int argc, char* argv[])
 	// Define the viewport dimensions
 	glViewport(0, 0, width, height);
 
+	vec3 eye = glm::vec3(0.0, 0.5, 5.0);
+	vec3 center = vec3(0, 1, 0);
+	vec3 up = vec3(0.0, 1.0, 0.0);
+	float fovy = 45.0f;
+	float aspect = (float)width / (float)height, zNear = 0.1f, zFar = 99.0f;
+	mat4 projection = glm::perspective(glm::radians(fovy), aspect, zNear, zFar);
+	mat4 modelView = glm::lookAt(eye, center, up);
+	
 	// OpenGL options
 	glEnable(GL_DEPTH_TEST);	
 	glfwSetInputMode(window, GLFW_STICKY_KEYS, GL_TRUE);
@@ -53,18 +53,84 @@ int main(int argc, char* argv[])
 	}
 	Scene myScene = Scene(argv[1]);
 	myScene.setupScene();
-
-	while (glfwGetKey(window, GLFW_KEY_ESCAPE) != GLFW_PRESS && !glfwWindowShouldClose(window))
+	float rotation = 1.0f;
+	float tx = 0;
+	float ty = 0;
+	float tz = 0;
+	float sc = 0.2f;
+	modelView = glm::translate(modelView, glm::vec3(0.0f, -4.0f, -4.0f));
+	modelView = glm::translate(modelView, glm::vec3(sc, sc, sc));
+	mat4 origin = modelView;
+	do
 	{
+		glfwPollEvents();
 		glClearColor(0, 0, 1, 0);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-		//render the object
-		glfwPollEvents();
-
+	
+		//take in keyboard input
+		if (glfwGetKey(window, GLFW_KEY_LEFT) == GLFW_PRESS)
+		{
+			
+			Transform::left(rotation, eye, up);
+			
+		}
+		else if (glfwGetKey(window, GLFW_KEY_RIGHT) == GLFW_PRESS)
+		{
+			Transform::left(-rotation, eye, up);
+		}
+		else if (glfwGetKey(window, GLFW_KEY_UP) == GLFW_PRESS)
+		{
+			modelView = glm::translate(modelView, vec3(-tx, -ty, -tz));
+			Transform::up(rotation, eye, up);
+			modelView = glm::translate(modelView, vec3(tx, ty, tz));
+		}
+		else if (glfwGetKey(window, GLFW_KEY_DOWN) == GLFW_PRESS)
+		{
+			Transform::up(-rotation, eye, up);
+		}
+		else if (glfwGetKey(window, GLFW_KEY_R) == GLFW_PRESS)
+		{
+			eye = glm::vec3(0.0, 0.5, 5.0);
+			up = vec3(0.0, 1.0, 0.0);
+			sc = 0.2f;
+			tx = 0;
+			ty = 0;
+			tz = 0;
+		}
+		else if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
+		{
+			ty += 0.1f;
+		}
+		else if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)
+		{
+			tx -= 0.1f;
+		}
+		else if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
+		{
+			ty -= 0.1f;
+		}
+		else if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
+		{
+			tx += 0.1f;
+		}
+		else if (glfwGetKey(window, GLFW_KEY_I) == GLFW_PRESS)
+		{
+			//sc += 0.0005;
+			sc += 1.0f;
+		}
+		else if (glfwGetKey(window, GLFW_KEY_O) == GLFW_PRESS)
+		{
+			sc -= 0.0005f;
+		}
+		//set up perspective projection
+		
+		modelView = glm::lookAt(eye, center, up);
+		modelView = glm::translate(modelView, vec3(tx, ty, tz));
+		modelView = glm::scale(modelView, vec3(sc, sc, sc));
 		myScene.render(projection, modelView);
 		glfwSwapBuffers(window);
-	}
+	} while (glfwGetKey(window, GLFW_KEY_ESCAPE) != GLFW_PRESS && !glfwWindowShouldClose(window));
 	glfwTerminate();
 	return 0;
 
-}
+}  
