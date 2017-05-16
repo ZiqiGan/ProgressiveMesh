@@ -4,6 +4,7 @@
 
 #include <stdlib.h>
 #include <vector> 
+#include <queue>
 
 #include <glm/glm.hpp>
 #include <glm/gtc/noise.hpp>
@@ -36,6 +37,13 @@ struct Vertex;
 struct Edge;
 struct Face;
 
+//
+struct CompareError {
+	bool operator()(Edge* const & e1, Edge* const & e2) {
+		// return "true" if "p1" is ordered before "p2", for example:
+		return e1->error < e2->error;
+	}
+};
 //define vertex structure
 struct Vertex {
 	glm::vec3 Position;
@@ -61,10 +69,19 @@ struct Edge {
 	vector<Face*> adjFaces;
 	vector<Edge*> adjEdges;
 	float error = 0.0f;
+	bool isValid = false;
 	Edge(Vertex* vt1, Vertex* vt2)
 	{
-		adjVertices.push_back(vt1);
-		adjVertices.push_back(vt2);
+		if (vt1->id <= vt2->id)
+		{
+			adjVertices.push_back(vt1);
+			adjVertices.push_back(vt2);
+		}
+		else
+		{
+			adjVertices.push_back(vt2);
+			adjVertices.push_back(vt1);
+		}
 	}
 
 };
@@ -72,10 +89,11 @@ struct Edge {
 struct Face {
 	vec3 normal;
 	//float area;
-
+	bool isValid = true;
 	vector<Vertex*> adjVertices = vector<Vertex*>(3);
 	vector<Face*> adjFaces;
 	vector<Edge*> adjEdges;
+
 	Face(Vertex* vertex1, Vertex* vertex2, Vertex* vertex3)
 	{
 		adjVertices[0] = vertex1;
@@ -108,6 +126,8 @@ public:
 	vector<vec3> vtNorms;
 	vector<vec3> faceNorms;
 	vector<GLuint> indices;
+	priority_queue < Edge*, vector<Edge*>, CompareError> weightedEdges;
+
 	int numVertics = 0;
 	int numFaces = 0;
 	int numEdges = 0;
