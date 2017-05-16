@@ -35,11 +35,12 @@ using namespace std;
 struct Vertex;
 struct Edge;
 struct Face;
+
 //define vertex structure
 struct Vertex {
 	glm::vec3 Position;
 	glm::vec3 Normal;
-
+	glm::mat4 Quadric = mat4(0);
 	int id;
 
 	vector<Vertex*> adjVertices;
@@ -59,6 +60,7 @@ struct Edge {
 	vector<Vertex*> adjVertices;
 	vector<Face*> adjFaces;
 	vector<Edge*> adjEdges;
+	float error = 0.0f;
 	Edge(Vertex* vt1, Vertex* vt2)
 	{
 		adjVertices.push_back(vt1);
@@ -70,6 +72,7 @@ struct Edge {
 struct Face {
 	vec3 normal;
 	//float area;
+
 	vector<Vertex*> adjVertices = vector<Vertex*>(3);
 	vector<Face*> adjFaces;
 	vector<Edge*> adjEdges;
@@ -115,6 +118,11 @@ public:
 	void setupMesh(); 
 	void Draw(Shader shader,mat4 modelview);
 	void edgeCollapse(Edge * edge);
+	mat4 fundamentalQuadric(float a, float b, float c, float d);
+	void computeVertexError(Vertex * curr);
+	void vertexErrors();
+	void computeEdgeError(Edge * edge);
+	void edgeErrors();
 private:
 	GLuint VAO, VBO,NBO, EBO;
 

@@ -282,7 +282,7 @@ void Mesh::Draw(Shader shader,mat4 modelview) {
 	glUniform3f(glGetUniformLocation(shader.Program, "light2.color"), 0.5f, 0.5f, 1.0f);
 	glUniform3f(glGetUniformLocation(shader.Program, "light2.position"),light2Pos[0], light2Pos[1], light2Pos[2]);
 	glBindVertexArray(this->VAO);
-	glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+	//glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 	
 	glDrawElements(GL_TRIANGLES, this->indices.size(), GL_UNSIGNED_INT, 0);
 
@@ -311,12 +311,87 @@ void Mesh::edgeCollapse(Edge* edge)
 			}
 		}
 	}
+
 	//process all faces neighboring to vertex 1
 	for (int i = 0; i < vt1->adjFaces.size(); i++)
 	{
-
+		Face* currFace = vt1->adjFaces[i];
+		for (int j = 0; j < 3; j++)
+		{
+			if (currFace->adjVertices[j]->id == vt1->id)
+			{
+				currFace->adjVertices[j] = toInsert;
+			}
+		}
 	}
+
 
 }
 
 
+
+
+/*-------------------------------------------------
+Below is the section for calculating Quadric Errors
+--------------------------------------------------*/
+
+//This is the matrix K defined in Section 5 of Garland 97.
+mat4 Mesh::fundamentalQuadric(float a,float b,float c,float d)
+{
+	return glm::mat4(pow(a, 2), a*b, a*c, a*d,
+					 a*b, pow(b, 2), b*c, b*d,
+					 a*c, b*c, pow(c, 2), c*d,
+					 a*d, b*d, c*d, pow(d, 2));
+}
+
+//compute vertex error metric by accumulating the Quadric of all its 
+//adjacent faces
+void Mesh::computeVertexError(Vertex* curr)
+{
+	mat4 Q = mat4(0);
+	vec3 vector = curr->Position;
+	for (unsigned int i = 0; i < curr->adjFaces.size(); i++)
+	{
+		vec3 n = curr->adjFaces[i]->normal;
+		float d = -1.0f*glm::dot(vector, n);
+		//accumulate quadric for each adjacent face
+		Q = Q + fundamentalQuadric(vector[0], vector[1], vector[2], d);
+	}
+	curr->Quadric = Q;
+}
+
+//assign error for all vertices
+void Mesh::vertexErrors()
+{
+	for (unsigned int i = 0; i < this->numVertics; i++)
+	{
+		computeVertexError(this->vertices[i]);
+	}
+}
+
+//compute the error for a valid pair
+void Mesh::computeEdgeError(Edge* edge)
+{
+	mat4 Q1 = edge->adjVertices[0]->Quadric;
+	mat4 Q2 = edge->adjVertices[1]->Quadric;
+	vec3 v1 = edge->adjVertices[0]->Position;
+	vec3 v2 = edge->adjVertices[1]->Position;
+	float e1 = Q1[0][0] * pow(v1[0], 2) + 2.0f*Q1[0][1] * v1[0] * v1[1] + 2.0f*Q1[0][2] * v1[0] * v1[2]
+		+ 2.0f*Q1[0][3] * v1[0] + Q1[1][1] * pow(v1[1], 2) + 2.0f*Q1[1][2] * v1[1] * v1[2] + 2.0f*Q1[1][3] * v1[2]
+		+ Q1[2][2] * pow(v1[2], 2) + 2 * Q1[2][3] * v1[2] + Q1[3][3];
+
+	float e2 = Q2[0][0] * pow(v2[0], 2) + 2.0f*Q2[0][1] * v2[0] * v2[1] + 2.0f*Q2[0][2] * v2[0] * v2[2]
+		+ 2.0f*Q2[0][3] * v2[0] + Q2[1][1] * pow(v2[1], 2) + 2.0f*Q2[1][2] * v2[1] * v2[2] + 2.0f*Q2[1][3] * v2[2]
+		+ Q2[2][2] * pow(v2[2], 2) + 2 * Q2[2][3] * v2[2] + Q2[3][3]; 
+
+	edge->error =  e1 + e2;
+}
+
+//compute error for all pairs
+void Mesh::edgeErrors()
+{
+	for (unsigned int i = 0; i < numEdges; i++)
+	{
+		computeEdgeError(this->edges[i]);
+	}
+}
