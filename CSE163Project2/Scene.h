@@ -11,6 +11,7 @@ public:
 	Scene(const char* path);
 	void setupScene();
 	void render(const mat4 & projection, const mat4 & modelview);
+	void MeshSimplification(int level);
 	~Scene();
 };
 

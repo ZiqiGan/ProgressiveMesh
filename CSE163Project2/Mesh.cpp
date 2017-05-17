@@ -308,6 +308,8 @@ void Mesh::Draw(Shader shader,mat4 modelview) {
 
 }
 
+
+
 void Mesh::edgeCollapse(Edge* edge)
 {	
 	Vertex* vt0 = edge->adjVertices[0];
@@ -318,9 +320,12 @@ void Mesh::edgeCollapse(Edge* edge)
 	Vertex* toInsert = new Vertex(newPos);
 
 
+	unordered_map<size_t, Edge*> uniqueEdges;
+
 	//process all faces neighboring to vertex 0
 	for (unsigned int i = 0; i < vt0->adjFaces.size(); i++)
 	{
+	
 		Face* currFace = vt0->adjFaces[i];
 		for (int j = 0; j < 3; j++)
 		{
@@ -328,6 +333,10 @@ void Mesh::edgeCollapse(Edge* edge)
 			//to process othe
 			if (currFace->adjVertices[j]->id = vt1->id)
 			{
+				for (int k = 0; k < 3; k++)
+				{
+					currFace->adjEdges[k] = NULL;
+				}
 				currFace = NULL;
 				continue;
 			}
@@ -337,8 +346,10 @@ void Mesh::edgeCollapse(Edge* edge)
 			{
 				currFace->adjVertices[j] = toInsert;
 			}
+			else {
+				toInsert->adjVertices.push_back(currFace->adjVertices[j]);
+			}
 		}
-
 		//calculate the new face normal
 		vec3 edge1 = currFace->adjVertices[0]->Position - currFace->adjVertices[1]->Position;
 		vec3 edge2 = currFace->adjVertices[2]->Position - currFace->adjVertices[1]->Position;
@@ -347,9 +358,11 @@ void Mesh::edgeCollapse(Edge* edge)
 		
 		//add adj face to new vertex
 		toInsert->adjFaces.push_back(currFace);
-		
-
 	}
+
+
+	//process edge adjacency  relationship
+	
 	
 	//process face adjacency of vertex 0
 	for (unsigned int i = 0; i < vt0->adjFaces.size(); i++)
@@ -360,10 +373,12 @@ void Mesh::edgeCollapse(Edge* edge)
 		}
 	}
 	
+
+	
 	//set the old vertex point to NULL;
 	vt0 = NULL;
 
-
+	 
 /*---------------------------------------------------*/
 
 	//process all faces neighboring to vertex 1
@@ -384,6 +399,10 @@ void Mesh::edgeCollapse(Edge* edge)
 			if (currFace->adjVertices[j]->id == vt1->id)
 			{
 				currFace->adjVertices[j] = toInsert;
+			}
+			else
+			{
+				toInsert->adjVertices.push_back(currFace->adjVertices[j]);
 			}
 		}
 
@@ -409,6 +428,8 @@ void Mesh::edgeCollapse(Edge* edge)
 	}
 	
 	vt1 = NULL;
+
+	/*-------------------------------------------------------*/
 	
 	//erase the old vertices
 	for (int i = 0; i < numVertics; i++)
@@ -434,13 +455,57 @@ void Mesh::edgeCollapse(Edge* edge)
 		}
 	}
 
+	//decrease the number of faces
 	this->numFaces = this->numFaces - faceErased;
 
+	//process the edges of faces
+	for (int i = 0; i < toInsert->adjFaces.size(); i++)
+	{
+		Face* temp = toInsert->adjFaces[i];
+		temp->adjEdges[0] = new Edge(temp->adjVertices[0], temp->adjVertices[1]);
+		temp->adjEdges[1] = new Edge(temp->adjVertices[1], temp->adjVertices[2]);
+		temp->adjEdges[2] = new Edge(temp->adjVertices[2], temp->adjVertices[0]);
+	}
 
-	////After edge collapse, update the error metric
-	//vertexErrors();
-	//edgeErrors();
+	
+	//erase all the degenerated edges from the edge vector
+	int edgeErased = 0;
+	for (int i = 0; i < this->edges.size(); i++)
+	{
+		if (edges[i] == NULL)
+		{
+			edges.erase(edges.begin() + i);
+			edgeErased++;
+		}
+	}
+	this->numEdges -= edgeErased;
 
+	//calculate the vertex normal for new vertex
+	vec3 normal = vec3(0);
+	for (int i = 0; i < toInsert->adjFaces.size(); i++)
+	{
+		normal = normal + toInsert->adjFaces[i]->normal;
+	}
+	normal = glm::normalize(normal);
+	toInsert->Normal = normal;
+
+	//calculate the vertex normals for all the adj vertices of the new vertex
+	for (int i = 0; i < toInsert->adjVertices.size(); i++)
+	{
+		vec3 normal = vec3(0);
+		for (int j = 0; j < toInsert->adjFaces.size(); j++)
+		{
+			normal = normal + toInsert->adjFaces[i]->normal;
+		}
+		normal = glm::normalize(normal);
+		toInsert->Normal = normal;
+		//update the vertex errors of the adj vertices
+		computeVertexError(toInsert->adjVertices[i]);
+	}
+
+	//compute the vertex errors of the new vertex
+	computeVertexError(toInsert);
+	
 }
 
 
@@ -509,6 +574,11 @@ void Mesh::computeEdgeError(Edge* edge)
 //compute error for all pairs
 void Mesh::edgeErrors()
 {
+	for (unsigned int i = 0; i < this->weightedEdges.size(); i++)
+	{
+		weightedEdges.pop();
+	}
+
 	for (unsigned int i = 0; i < numEdges; i++)
 	{
 		computeEdgeError(this->edges[i]);

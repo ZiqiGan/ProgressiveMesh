@@ -27,6 +27,17 @@ void Scene::render(const mat4 & projection, const mat4 & modelview)
 	object.Draw(shader,modelview);
 }
 
+void Scene::MeshSimplification(int level)
+{
+	Edge* toCollapse;
+	for (int i = 0; i < level; i++)
+	{
+		toCollapse = object.weightedEdges.top();
+		object.edgeCollapse(toCollapse);
+		object.edgeErrors();
+	}
+}
+
 Scene::~Scene()
 {
 }

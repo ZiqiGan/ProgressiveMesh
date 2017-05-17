@@ -37,13 +37,7 @@ struct Vertex;
 struct Edge;
 struct Face;
 
-//
-struct CompareError {
-	bool operator()(Edge* const & e1, Edge* const & e2) {
-		// return "true" if "p1" is ordered before "p2", for example:
-		return e1->error < e2->error;
-	}
-};
+
 //define vertex structure
 struct Vertex {
 	glm::vec3 Position;
@@ -114,6 +108,14 @@ struct Material {
 struct Light {
 	vec3 position;
 	vec3 color;
+};
+
+
+struct CompareError {
+	bool operator()(Edge* const & e1, Edge* const & e2) {
+		// return "true" if "p1" is ordered before "p2", for example:
+		return e1->error < e2->error;
+	}
 };
 
 class Mesh
