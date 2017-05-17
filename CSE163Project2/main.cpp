@@ -122,6 +122,10 @@ int main(int argc, char* argv[])
 		{
 			sc -= 0.0005f;
 		}
+		else if (glfwGetKey(window, GLFW_KEY_1) == GLFW_PRESS)
+		{
+			myScene.MeshSimplification(1);
+		}
 		//set up perspective projection
 		
 		modelView = glm::lookAt(eye, center, up);

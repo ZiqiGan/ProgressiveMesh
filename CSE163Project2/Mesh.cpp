@@ -139,7 +139,7 @@ void Mesh::processMesh()
 	char buff2[500];
 	sprintf_s(buff2, "Processing Mesh\n");
 	OutputDebugStringA(buff2);
-	unordered_map<size_t, Edge*> uniqueEdges;
+	unordered_map<string, Edge*> uniqueEdges;
 	//process edge adjacency relationship
 
 	for (int i = 0; i < numFaces; i++)
@@ -155,7 +155,8 @@ void Mesh::processMesh()
 		}
 		//adj face for edge
 		edge1->adjFaces.push_back(currFace);
-		uniqueEdges.insert(std::make_pair(hash<Edge*>{}(edge1), edge1));
+		//uniqueEdges.insert(std::make_pair(hash<Edge*>{}(edge1), edge1));
+		uniqueEdges.insert(std::make_pair(edge1->id, edge1));
 			
 		Edge* edge2 = new Edge(currFace->adjVertices[1], currFace->adjVertices[2]);
 		if (glm::abs(glm::distance(currFace->adjVertices[1]->Position, currFace->adjVertices[2]->Position)) < 0)
@@ -163,16 +164,17 @@ void Mesh::processMesh()
 			edge1->isValid = true;
 		}
 		edge2->adjFaces.push_back(currFace);
-		uniqueEdges.insert(std::make_pair(hash<Edge*>{}(edge2), edge2));
-			
+		//uniqueEdges.insert(std::make_pair(hash<Edge*>{}(edge2), edge2));
+		uniqueEdges.insert(std::make_pair(edge2->id, edge2));
 		Edge* edge3 = new Edge(currFace->adjVertices[2], currFace->adjVertices[0]);
 		if (glm::abs(glm::distance(currFace->adjVertices[2]->Position, currFace->adjVertices[0]->Position)) < 0)
 		{
 			edge1->isValid = true;
 		}
 		edge3->adjFaces.push_back(currFace);
-		uniqueEdges.insert(std::make_pair(hash<Edge*>{}(edge3), edge3));
-			
+		//uniqueEdges.insert(std::make_pair(hash<Edge*>{}(edge3), edge3));
+		uniqueEdges.insert(std::make_pair(edge3->id, edge3));
+		
 		//adj edge for edge
 		edge1->adjEdges.push_back(edge2);
 		edge1->adjEdges.push_back(edge3);
@@ -238,7 +240,7 @@ void Mesh::processMesh()
 	//Compute initial Quadric Errors
 	vertexErrors();
 	edgeErrors();
-
+	
 }
 
 void Mesh::setupMesh()
@@ -302,10 +304,10 @@ void Mesh::Draw(Shader shader,mat4 modelview) {
 	glUniform3f(glGetUniformLocation(shader.Program, "light2.color"), 0.5f, 0.5f, 1.0f);
 	glUniform3f(glGetUniformLocation(shader.Program, "light2.position"),light2Pos[0], light2Pos[1], light2Pos[2]);
 	glBindVertexArray(this->VAO);
-	//glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+	glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 	
 	glDrawElements(GL_TRIANGLES, this->indices.size(), GL_UNSIGNED_INT, 0);
-
+	//glDrawArrays(GL_TRIANGLES, 0,this->vertices.size());
 }
 
 
@@ -314,41 +316,57 @@ void Mesh::edgeCollapse(Edge* edge)
 {	
 	Vertex* vt0 = edge->adjVertices[0];
 	Vertex* vt1 = edge->adjVertices[1];
-
+	int id1 = vt0->id;
+	int id2 = vt1->id;
 	//create the new vertex on the edge
 	vec3 newPos = (vt0->Position + vt1->Position) * 0.5f;
 	Vertex* toInsert = new Vertex(newPos);
-
+	toInsert->id = 100;
+	
+	vector<int> fuck1;
 
 	unordered_map<size_t, Edge*> uniqueEdges;
 
 	//process all faces neighboring to vertex 0
 	for (unsigned int i = 0; i < vt0->adjFaces.size(); i++)
 	{
-	
 		Face* currFace = vt0->adjFaces[i];
 		for (int j = 0; j < 3; j++)
 		{
 			//if curr face is degenerated, set it to null and continue 
-			//to process othe
-			if (currFace->adjVertices[j]->id = vt1->id)
+			//to process other faces
+			if (currFace->adjVertices[j] == vt1)
 			{
+				fuck1.push_back(currFace->adjVertices[0]->id);
+				fuck1.push_back(currFace->adjVertices[1]->id);
+				fuck1.push_back(currFace->adjVertices[2]->id);
 				for (int k = 0; k < 3; k++)
 				{
-					currFace->adjEdges[k] = NULL;
+					//delete the old edges
+					delete currFace->adjEdges[k];
 				}
-				currFace = NULL;
-				continue;
+				
+				delete vt0->adjFaces[i];
+				break;
 			}
-			
+		}
+
+		if (vt0->adjFaces[i]->adjVertices.size()==0)
+		{
+			continue;
+		}
+
+		for (int j = 0; j < 3; j++)
+		{
+			delete currFace->adjEdges[j];
 			//change the corresponding vertex of new face to the new vertex
 			if (currFace->adjVertices[j]->id == vt0->id)
 			{
 				currFace->adjVertices[j] = toInsert;
 			}
-			else {
-				toInsert->adjVertices.push_back(currFace->adjVertices[j]);
-			}
+			//else {
+			//	toInsert->adjVertices.push_back(currFace->adjVertices[j]);
+			//}
 		}
 		//calculate the new face normal
 		vec3 edge1 = currFace->adjVertices[0]->Position - currFace->adjVertices[1]->Position;
@@ -358,27 +376,12 @@ void Mesh::edgeCollapse(Edge* edge)
 		
 		//add adj face to new vertex
 		toInsert->adjFaces.push_back(currFace);
+	
 	}
+		
+	//delete the old vertex
+	delete vt0;
 
-
-	//process edge adjacency  relationship
-	
-	
-	//process face adjacency of vertex 0
-	for (unsigned int i = 0; i < vt0->adjFaces.size(); i++)
-	{
-		if (vt0->adjFaces[i] == NULL)
-		{
-			vt0->adjFaces.erase(vt0->adjFaces.begin() + i );
-		}
-	}
-	
-
-	
-	//set the old vertex point to NULL;
-	vt0 = NULL;
-
-	 
 /*---------------------------------------------------*/
 
 	//process all faces neighboring to vertex 1
@@ -388,22 +391,23 @@ void Mesh::edgeCollapse(Edge* edge)
 		
 		//if if currFace is already degenerated, just continue to 
 		//process other adj faces
-		if (currFace == NULL)
+		if (currFace->adjVertices.size()==0)
 		{
 			continue;
 		}
 
 		for (int j = 0; j < 3; j++)
 		{
+			delete currFace->adjEdges[j];
 			//change the corresponding vertex of new face to the new vertex
 			if (currFace->adjVertices[j]->id == vt1->id)
 			{
 				currFace->adjVertices[j] = toInsert;
 			}
-			else
-			{
-				toInsert->adjVertices.push_back(currFace->adjVertices[j]);
-			}
+			//else
+			//{
+			//	toInsert->adjVertices.push_back(currFace->adjVertices[j]);
+			//}
 		}
 
 		//calculate the new face normal
@@ -414,27 +418,17 @@ void Mesh::edgeCollapse(Edge* edge)
 
 		//add adj face to new vertex
 		toInsert->adjFaces.push_back(currFace);
-
-
-	}
-
-	//process face adjacency of vertex 1
-	for (unsigned int i = 0; i < vt1->adjFaces.size(); i++)
-	{
-		if (vt1->adjFaces[i] == NULL)
-		{
-			vt0->adjFaces.erase(vt0->adjFaces.begin() + i);
-		}
 	}
 	
-	vt1 = NULL;
+	delete vt1;
 
 	/*-------------------------------------------------------*/
 	
 	//erase the old vertices
-	for (int i = 0; i < numVertics; i++)
+	for (int i = 0; i < this->vertices.size(); i++)
 	{
-		if (vertices[i] == NULL)
+
+		if (vertices[i]->adjFaces.size()==0)
 		{
 			vertices.erase(vertices.begin() + i);
 		}
@@ -444,67 +438,182 @@ void Mesh::edgeCollapse(Edge* edge)
 	this->vertices.push_back(toInsert);
 	this->numVertics = this->numVertics - 1;
 
+
+	vector<int> erasedIndices;
+	//erase the degenereated indices
+	for (int i = 0; i < this->indices.size(); i+=3)
+	{
+		if (indices[i] == fuck1[0] && indices[i + 1] == fuck1[1] && indices[i + 2] == fuck1[2])
+		{
+			erasedIndices.push_back(i);
+			erasedIndices.push_back(i+1);
+			erasedIndices.push_back(i+2);
+		}
+		else if (indices[i] == fuck1[0] && indices[i + 1] == fuck1[2] && indices[i + 2] == fuck1[1])
+		{
+			erasedIndices.push_back(i);
+			erasedIndices.push_back(i + 1);
+			erasedIndices.push_back(i + 2);
+		}
+		else if (indices[i] == fuck1[1] && indices[i + 1] == fuck1[0] && indices[i + 2] == fuck1[2])
+		{
+			erasedIndices.push_back(i);
+			erasedIndices.push_back(i + 1);
+			erasedIndices.push_back(i + 2);
+		}
+		else if (indices[i] == fuck1[1] && indices[i + 1] == fuck1[2] && indices[i + 2] == fuck1[0])
+		{
+			erasedIndices.push_back(i);
+			erasedIndices.push_back(i + 1);
+			erasedIndices.push_back(i + 2);
+		}
+		else if (indices[i] == fuck1[2] && indices[i + 1] == fuck1[0] && indices[i + 2] == fuck1[1])
+		{
+			erasedIndices.push_back(i);
+			erasedIndices.push_back(i + 1);
+			erasedIndices.push_back(i + 2);
+		}
+		else if (indices[i] == fuck1[2] && indices[i + 1] == fuck1[1] && indices[i + 2] == fuck1[0])
+		{
+			erasedIndices.push_back(i);
+			erasedIndices.push_back(i + 1);
+			erasedIndices.push_back(i + 2);
+		}
+		else if (indices[i] == fuck1[3] && indices[i + 1] == fuck1[4] && indices[i + 2] == fuck1[5])
+		{
+			erasedIndices.push_back(i);
+			erasedIndices.push_back(i + 1);
+			erasedIndices.push_back(i + 2);
+		}
+		else if (indices[i] == fuck1[3] && indices[i + 1] == fuck1[5] && indices[i + 2] == fuck1[4])
+		{
+			erasedIndices.push_back(i);
+			erasedIndices.push_back(i + 1);
+			erasedIndices.push_back(i + 2);
+		}
+		else if (indices[i] == fuck1[4] && indices[i + 1] == fuck1[3] && indices[i + 2] == fuck1[5])
+		{
+			erasedIndices.push_back(i);
+			erasedIndices.push_back(i + 1);
+			erasedIndices.push_back(i + 2);
+		}
+		else if (indices[i] == fuck1[4] && indices[i + 1] == fuck1[5] && indices[i + 2] == fuck1[3])
+		{
+			erasedIndices.push_back(i);
+			erasedIndices.push_back(i + 1);
+			erasedIndices.push_back(i + 2);
+		}
+		else if (indices[i] == fuck1[5] && indices[i + 1] == fuck1[3] && indices[i + 2] == fuck1[4])
+		{
+			erasedIndices.push_back(i);
+			erasedIndices.push_back(i + 1);
+			erasedIndices.push_back(i + 2);
+		}
+		else if (indices[i] == fuck1[5] && indices[i + 1] == fuck1[4] && indices[i + 2] == fuck1[3])
+		{
+			erasedIndices.push_back(i);
+			erasedIndices.push_back(i + 1);
+			erasedIndices.push_back(i + 2);
+		}
+	}
+
+	for (int i = 0; i < erasedIndices.size(); i++)
+	{
+		cout << "fuck" << endl;
+		this->indices.erase(indices.begin() + i);
+	}
+
+	for (int i = 0; i < indices.size(); i++)
+	{
+		if (indices[i] == id1 || indices[i] == id2)
+		{
+			indices[i] = numVertics - 1;
+		}
+	}
+
 	//erase the old faces
 	int faceErased = 0;
-	for (int i = 0; i < numFaces; i++)
+	vector<int> erasedIndex;
+	for (int i = 0; i < faces.size(); i++)
 	{
-		if (faces[i] == NULL)
+		if (faces[i]->adjVertices.size()==0)
 		{
 			faceErased++;
-			faces.erase(faces.begin() + i);
+			erasedIndex.push_back(i);
+			//faces.erase(faces.begin() + i);
 		}
+	}
+
+
+
+	for (int i = 0; i < erasedIndex.size(); i++)
+	{
+		faces.erase(faces.begin() + erasedIndex[i]);
 	}
 
 	//decrease the number of faces
 	this->numFaces = this->numFaces - faceErased;
 
-	//process the edges of faces
-	for (int i = 0; i < toInsert->adjFaces.size(); i++)
-	{
-		Face* temp = toInsert->adjFaces[i];
-		temp->adjEdges[0] = new Edge(temp->adjVertices[0], temp->adjVertices[1]);
-		temp->adjEdges[1] = new Edge(temp->adjVertices[1], temp->adjVertices[2]);
-		temp->adjEdges[2] = new Edge(temp->adjVertices[2], temp->adjVertices[0]);
-	}
 
-	
-	//erase all the degenerated edges from the edge vector
-	int edgeErased = 0;
-	for (int i = 0; i < this->edges.size(); i++)
-	{
-		if (edges[i] == NULL)
-		{
-			edges.erase(edges.begin() + i);
-			edgeErased++;
-		}
-	}
-	this->numEdges -= edgeErased;
+	////process the edges of faces
+	//int edgeErased = 0;
+	//erasedIndex.clear();
+	//for (int i = 0; i < this->edges.size(); i++)
+	//{
+	//	if (edges[i]->adjVertices.size()==0)
+	//	{
+	//		edgeErased++;
+	//		erasedIndex.push_back(i);
+	//	}
+	//}
 
-	//calculate the vertex normal for new vertex
-	vec3 normal = vec3(0);
-	for (int i = 0; i < toInsert->adjFaces.size(); i++)
-	{
-		normal = normal + toInsert->adjFaces[i]->normal;
-	}
-	normal = glm::normalize(normal);
-	toInsert->Normal = normal;
+	//for (int i = 0; i < erasedIndex.size(); i++)
+	//{
+	//	edges.erase(edges.begin() + erasedIndex[i]);
+	//}
+	//this->numEdges -= edgeErased;
+	//
+	//for (int i = 0; i < toInsert->adjFaces.size(); i++)
+	//{
+	//	Face* temp = toInsert->adjFaces[i];
+	//
 
-	//calculate the vertex normals for all the adj vertices of the new vertex
-	for (int i = 0; i < toInsert->adjVertices.size(); i++)
-	{
-		vec3 normal = vec3(0);
-		for (int j = 0; j < toInsert->adjFaces.size(); j++)
-		{
-			normal = normal + toInsert->adjFaces[i]->normal;
-		}
-		normal = glm::normalize(normal);
-		toInsert->Normal = normal;
-		//update the vertex errors of the adj vertices
-		computeVertexError(toInsert->adjVertices[i]);
-	}
+	//	temp->adjEdges[0] = new Edge(temp->adjVertices[0], temp->adjVertices[1]);
 
-	//compute the vertex errors of the new vertex
-	computeVertexError(toInsert);
+	//	temp->adjEdges[1] = new Edge(temp->adjVertices[1], temp->adjVertices[2]);
+	//
+	//	temp->adjEdges[2] = new Edge(temp->adjVertices[2], temp->adjVertices[0]);
+	//}
+
+	//
+	////erase all the degenerated edges from the edge vector
+
+
+	////calculate the vertex normal for new vertex
+	//vec3 normal = vec3(0);
+	//for (int i = 0; i < toInsert->adjFaces.size(); i++)
+	//{
+	//	normal = normal + toInsert->adjFaces[i]->normal;
+	//}
+	//normal = glm::normalize(normal);
+	//toInsert->Normal = normal;
+
+	////calculate the vertex normals for all the adj vertices of the new vertex
+	//for (int i = 0; i < toInsert->adjVertices.size(); i++)
+	//{
+	//	vec3 normal = vec3(0);
+	//	for (int j = 0; j < toInsert->adjFaces.size(); j++)
+	//	{
+	//		normal = normal + toInsert->adjFaces[i]->normal;
+	//	}
+	//	normal = glm::normalize(normal);
+	//	toInsert->Normal = normal;
+	//	//update the vertex errors of the adj vertices
+	//	computeVertexError(toInsert->adjVertices[i]);
+	//}
+
+	////compute the vertex errors of the new vertex
+	//computeVertexError(toInsert);
 	
 }
 
@@ -566,7 +675,8 @@ void Mesh::computeEdgeError(Edge* edge)
 		+ 2.0f*Q2[0][3] * v2[0] + Q2[1][1] * pow(v2[1], 2) + 2.0f*Q2[1][2] * v2[1] * v2[2] + 2.0f*Q2[1][3] * v2[2]
 		+ Q2[2][2] * pow(v2[2], 2) + 2 * Q2[2][3] * v2[2] + Q2[3][3]; 
 
-	edge->error =  e1 + e2;
+	edge->error = e1 + e2;
+	//cout << e1 + e2 << endl;
 }
 
 
@@ -583,7 +693,13 @@ void Mesh::edgeErrors()
 	{
 		computeEdgeError(this->edges[i]);
 		this->weightedEdges.push(edges[i]);
+	
 	}
+	//for (unsigned int i = 0; i < numEdges; i++)
+	//{
+	//	cout << weightedEdges.top()->error << endl;
+	//	weightedEdges.pop();
+	//}
 	
 }
 

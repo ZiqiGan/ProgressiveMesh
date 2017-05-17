@@ -64,17 +64,22 @@ struct Edge {
 	vector<Edge*> adjEdges;
 	float error = 0.0f;
 	bool isValid = false;
+	bool isActive = true;
+	string id;
 	Edge(Vertex* vt1, Vertex* vt2)
 	{
 		if (vt1->id <= vt2->id)
 		{
 			adjVertices.push_back(vt1);
 			adjVertices.push_back(vt2);
+			id = to_string(adjVertices[0]->id) + to_string(adjVertices[1]->id);
+		
 		}
 		else
 		{
 			adjVertices.push_back(vt2);
 			adjVertices.push_back(vt1);
+			id = to_string(adjVertices[0]->id) + to_string(adjVertices[1]->id);
 		}
 	}
 
@@ -114,7 +119,7 @@ struct Light {
 struct CompareError {
 	bool operator()(Edge* const & e1, Edge* const & e2) {
 		// return "true" if "p1" is ordered before "p2", for example:
-		return e1->error < e2->error;
+		return e1->error > e2->error;
 	}
 };
 
