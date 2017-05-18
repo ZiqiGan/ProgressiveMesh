@@ -321,11 +321,8 @@ void Mesh::edgeCollapse(Edge* edge)
 	//create the new vertex on the edge
 	vec3 newPos = (vt0->Position + vt1->Position) * 0.5f;
 	Vertex* toInsert = new Vertex(newPos);
-	toInsert->id = 11;
+	toInsert->id = numVertics-1;
 	
-	vector<int> fuck1;
-
-	unordered_map<size_t, Edge*> uniqueEdges;
 
 	//process all faces neighboring to vertex 0
 	for (unsigned int i = 0; i < vt0->adjFaces.size(); i++)
@@ -333,41 +330,45 @@ void Mesh::edgeCollapse(Edge* edge)
 		Face* currFace = vt0->adjFaces[i];
 		for (int j = 0; j < 3; j++)
 		{
-			//if curr face is degenerated, set it to null and continue 
+			//if curr face is degenerated, deactive it and continue 
 			//to process other faces
 			if (currFace->adjVertices[j] == vt1)
 			{
-				fuck1.push_back(currFace->adjVertices[0]->id);
-				fuck1.push_back(currFace->adjVertices[1]->id);
-				fuck1.push_back(currFace->adjVertices[2]->id);
-				for (int k = 0; k < 3; k++)
+			
+			/*	for (int k = 0; k < 3; k++)
 				{
-					//delete the old edges
-					delete currFace->adjEdges[k];
-			/*		currFace->adjEdges[k]->isActive = false;*/
-				}
+					currFace->adjEdges[k]->isActive = false;
+				}*/
 
-				delete vt0->adjFaces[i];
+				vt0->adjFaces[i]->isActive = false;
 				break;
 			}
 		}
 
-		if (vt0->adjFaces[i]->adjVertices.size()==0)
+		if (vt0->adjFaces[i]->isActive == false)
 		{
 			continue;
 		}
 
 		for (int j = 0; j < 3; j++)
 		{
-			currFace->adjEdges[j];
+			//update the adj vertex of modifited edge
+			Edge* temp = currFace->adjEdges[j];
+			
+			if (temp->adjVertices[0]->id == vt0->id)
+			{
+				temp->adjVertices[0] = toInsert;
+			}
+			else if (temp->adjVertices[1]->id == vt0->id)
+			{
+				temp->adjVertices[1] = toInsert;
+			}
+    
 			//change the corresponding vertex of new face to the new vertex
 			if (currFace->adjVertices[j]->id == vt0->id)
 			{
 				currFace->adjVertices[j] = toInsert;
 			}
-			//else {
-			//	toInsert->adjVertices.push_back(currFace->adjVertices[j]);
-			//}
 		}
 		//calculate the new face normal
 		vec3 edge1 = currFace->adjVertices[0]->Position - currFace->adjVertices[1]->Position;
@@ -380,8 +381,6 @@ void Mesh::edgeCollapse(Edge* edge)
 	
 	}
 		
-	//delete the old vertex
-	delete vt0;
 
 /*---------------------------------------------------*/
 
@@ -392,23 +391,29 @@ void Mesh::edgeCollapse(Edge* edge)
 		
 		//if if currFace is already degenerated, just continue to 
 		//process other adj faces
-		if (currFace->adjVertices.size()==0)
+		if (currFace->isActive == false)
 		{
 			continue;
 		}
 
 		for (int j = 0; j < 3; j++)
 		{
-			delete currFace->adjEdges[j];
+			//update the adj vertex of modifited edge
+			Edge* temp = currFace->adjEdges[j];
+
+			if (temp->adjVertices[0]->id == vt0->id)
+			{
+				temp->adjVertices[0] = toInsert;
+			}
+			else if (temp->adjVertices[1]->id == vt0->id)
+			{
+				temp->adjVertices[1] = toInsert;
+			}
 			//change the corresponding vertex of new face to the new vertex
 			if (currFace->adjVertices[j]->id == vt1->id)
 			{
 				currFace->adjVertices[j] = toInsert;
 			}
-			//else
-			//{
-			//	toInsert->adjVertices.push_back(currFace->adjVertices[j]);
-			//}
 		}
 
 		//calculate the new face normal
@@ -421,136 +426,52 @@ void Mesh::edgeCollapse(Edge* edge)
 		toInsert->adjFaces.push_back(currFace);
 	}
 	
-	delete vt1;
 
 	/*-------------------------------------------------------*/
 	
-	//erase the old vertices
-	//for (int i = 0; i < this->vertices.size(); i++)
-	//{
-
-	//	if (vertices[i]->adjFaces.size()==0)
-	//	{
-	//		vertices.erase(vertices.begin() + i);
-	//	}
-	//}
 	vertices[id1]->isActive = false;
 	vertices[id2]->isActive = false;
 	vector<Vertex*> newVertics;
+	vector<vec3> newVtPos;
+	vector<vec3> newVtNorms;
+	int index = 0;
 	for (int i = 0; i < this->vertices.size(); i++)
 	{
 		if (vertices[i]->isActive == true) 
 		{
 			newVertics.push_back(vertices[i]);
+			vertices[i]->id = index;
+			newVtPos.push_back(vertices[i]->Position);
+			newVtNorms.push_back(vec3(1.0f, 1.0f, 1.0f));
+			index++;
 		}
 	}
-
+	newVtPos.push_back(toInsert->Position);
+	newVtNorms.push_back(toInsert->Normal);
+	this->vtPos = newVtPos;
+	this->vtNorms = newVtNorms;
 	newVertics.push_back(toInsert);
 	this->vertices = newVertics;
 	this->numVertics = this->numVertics - 1;
+	toInsert->id = numVertics-1;
 
-
-	vector<int> erasedIndices;
-	//erase the degenereated indices
-	for (int i = 0; i < this->indices.size(); i+=3)
-	{
-		if (indices[i] == fuck1[0] && indices[i + 1] == fuck1[1] && indices[i + 2] == fuck1[2])
-		{
-			erasedIndices.push_back(i);
-			erasedIndices.push_back(i+1);
-			erasedIndices.push_back(i+2);
-		}
-		else if (indices[i] == fuck1[0] && indices[i + 1] == fuck1[2] && indices[i + 2] == fuck1[1])
-		{
-			erasedIndices.push_back(i);
-			erasedIndices.push_back(i + 1);
-			erasedIndices.push_back(i + 2);
-		}
-		else if (indices[i] == fuck1[1] && indices[i + 1] == fuck1[0] && indices[i + 2] == fuck1[2])
-		{
-			erasedIndices.push_back(i);
-			erasedIndices.push_back(i + 1);
-			erasedIndices.push_back(i + 2);
-		}
-		else if (indices[i] == fuck1[1] && indices[i + 1] == fuck1[2] && indices[i + 2] == fuck1[0])
-		{
-			erasedIndices.push_back(i);
-			erasedIndices.push_back(i + 1);
-			erasedIndices.push_back(i + 2);
-		}
-		else if (indices[i] == fuck1[2] && indices[i + 1] == fuck1[0] && indices[i + 2] == fuck1[1])
-		{
-			erasedIndices.push_back(i);
-			erasedIndices.push_back(i + 1);
-			erasedIndices.push_back(i + 2);
-		}
-		else if (indices[i] == fuck1[2] && indices[i + 1] == fuck1[1] && indices[i + 2] == fuck1[0])
-		{
-			erasedIndices.push_back(i);
-			erasedIndices.push_back(i + 1);
-			erasedIndices.push_back(i + 2);
-		}
-		else if (indices[i] == fuck1[3] && indices[i + 1] == fuck1[4] && indices[i + 2] == fuck1[5])
-		{
-			erasedIndices.push_back(i);
-			erasedIndices.push_back(i + 1);
-			erasedIndices.push_back(i + 2);
-		}
-		else if (indices[i] == fuck1[3] && indices[i + 1] == fuck1[5] && indices[i + 2] == fuck1[4])
-		{
-			erasedIndices.push_back(i);
-			erasedIndices.push_back(i + 1);
-			erasedIndices.push_back(i + 2);
-		}
-		else if (indices[i] == fuck1[4] && indices[i + 1] == fuck1[3] && indices[i + 2] == fuck1[5])
-		{
-			erasedIndices.push_back(i);
-			erasedIndices.push_back(i + 1);
-			erasedIndices.push_back(i + 2);
-		}
-		else if (indices[i] == fuck1[4] && indices[i + 1] == fuck1[5] && indices[i + 2] == fuck1[3])
-		{
-			erasedIndices.push_back(i);
-			erasedIndices.push_back(i + 1);
-			erasedIndices.push_back(i + 2);
-		}
-		else if (indices[i] == fuck1[5] && indices[i + 1] == fuck1[3] && indices[i + 2] == fuck1[4])
-		{
-			erasedIndices.push_back(i);
-			erasedIndices.push_back(i + 1);
-			erasedIndices.push_back(i + 2);
-		}
-		else if (indices[i] == fuck1[5] && indices[i + 1] == fuck1[4] && indices[i + 2] == fuck1[3])
-		{
-			erasedIndices.push_back(i);
-			erasedIndices.push_back(i + 1);
-			erasedIndices.push_back(i + 2);
-		}
-	}
-
-
-	
 
 	//erase the old faces
 	int faceErased = 0;
-	vector<int> erasedIndex;
+	vector<Face*> newFaces;
 	for (int i = 0; i < faces.size(); i++)
 	{
-		if (faces[i]->adjVertices.size()==0)
+		if (faces[i]->isActive == false)
 		{
 			faceErased++;
-			erasedIndex.push_back(i);
+		}
+		else
+		{
+			newFaces.push_back(faces[i]);
 		}
 	}
-	
-	
-	//for (int i = 0; i < erasedIndex.size(); i++)
-	//{
-	//	faces.erase(faces.begin() + erasedIndex[i]);
-	//}
-
-	//decrease the number of faces
-	this->numFaces = this->numFaces - faceErased;
+	this->faces = newFaces;
+	this->numFaces = numFaces - faceErased;
 
 	vector<GLuint> updateIndices;
 	for (int i = 0; i < numFaces; i++)
@@ -561,40 +482,34 @@ void Mesh::edgeCollapse(Edge* edge)
 			updateIndices.push_back(id);
 		}
 	}
-	
-	this->indices = updateIndices;
-	////process the edges of faces
-	//int edgeErased = 0;
-	//erasedIndex.clear();
-	//for (int i = 0; i < this->edges.size(); i++)
-	//{
-	//	if (edges[i]->adjVertices.size()==0)
-	//	{
-	//		edgeErased++;
-	//		erasedIndex.push_back(i);
-	//	}
-	//}
 
-	//for (int i = 0; i < erasedIndex.size(); i++)
-	//{
-	//	edges.erase(edges.begin() + erasedIndex[i]);
-	//}
-	//this->numEdges -= edgeErased;
-	//
+	this->indices = updateIndices;
+
+	////update the vertex erros
 	//for (int i = 0; i < toInsert->adjFaces.size(); i++)
 	//{
 	//	Face* temp = toInsert->adjFaces[i];
-	//
-
-	//	temp->adjEdges[0] = new Edge(temp->adjVertices[0], temp->adjVertices[1]);
-
-	//	temp->adjEdges[1] = new Edge(temp->adjVertices[1], temp->adjVertices[2]);
-	//
-	//	temp->adjEdges[2] = new Edge(temp->adjVertices[2], temp->adjVertices[0]);
+	//	for (int j = 0; j < 3; j++)
+	//	{
+	//		computeVertexError(temp->adjVertices[j]);
+	//	}
 	//}
 
+	//TODO: How to update edges efficiently?????
+
+	//edge->isActive = false;
+	//vector<Edge*> newEdges;
+	//for (int i = 0; i < numEdges; i++)
+	//{
+	//	if (edges[i]->isActive)
+	//	{
+	//		newEdges.push_back(edges[i]);
+	//	}
+	//}
+
+	//numEdges = numEdges - 1;
 	//
-	////erase all the degenerated edges from the edge vector
+	//this->edges = newEdges;
 
 
 	////calculate the vertex normal for new vertex

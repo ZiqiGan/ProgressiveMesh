@@ -37,11 +37,17 @@ void Scene::MeshSimplification(int level)
 	//	object.edgeCollapse(toCollapse);
 	//	object.edgeErrors();
 	//}
+	for (int i = 0; i < level; i++)
+	{
+	
+		Edge* toCollapse = object.edges[i];
+		object.edgeCollapse(toCollapse);
 
-	Edge* toCollapse = object.weightedEdges.top();
-	//Edge* toCollapse = object.edges[1];
-	object.edgeCollapse(toCollapse);
+	}
+	/*Edge* toCollapse = object.edges[3];
+	object.edgeCollapse(toCollapse);*/
 }
+
 
 Scene::~Scene()
 {

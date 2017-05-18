@@ -61,6 +61,9 @@ int main(int argc, char* argv[])
 	modelView = glm::translate(modelView, glm::vec3(0.0f, -4.0f, -4.0f));
 	modelView = glm::translate(modelView, glm::vec3(sc, sc, sc));
 	mat4 origin = modelView;
+	//myScene.MeshSimplification(50);
+	int maxCollapse = 10;
+	int collapseCount = 0;
 	do
 	{
 		glfwPollEvents();
@@ -116,7 +119,7 @@ int main(int argc, char* argv[])
 		else if (glfwGetKey(window, GLFW_KEY_I) == GLFW_PRESS)
 		{
 			//sc += 0.0005;
-			sc += 0.3f;
+			sc += 0.003f;
 		}
 		else if (glfwGetKey(window, GLFW_KEY_O) == GLFW_PRESS)
 		{
@@ -124,8 +127,9 @@ int main(int argc, char* argv[])
 		}
 		else if (glfwGetKey(window, GLFW_KEY_1) == GLFW_PRESS)
 		{
-			myScene.MeshSimplification(1);
+			myScene.MeshSimplification(10);
 		}
+
 		//set up perspective projection
 		
 		modelView = glm::lookAt(eye, center, up);
