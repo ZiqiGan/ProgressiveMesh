@@ -44,6 +44,7 @@ struct Vertex {
 	glm::vec3 Normal;
 	glm::mat4 Quadric = mat4(0);
 	int id;
+	bool isActive = true;
 
 	vector<Vertex*> adjVertices;
 	vector<Face*> adjFaces;
@@ -88,7 +89,7 @@ struct Edge {
 struct Face {
 	vec3 normal;
 	//float area;
-	bool isValid = true;
+	bool isActive = true;
 	vector<Vertex*> adjVertices = vector<Vertex*>(3);
 	vector<Face*> adjFaces;
 	vector<Edge*> adjEdges;

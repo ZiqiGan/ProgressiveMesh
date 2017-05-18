@@ -321,7 +321,7 @@ void Mesh::edgeCollapse(Edge* edge)
 	//create the new vertex on the edge
 	vec3 newPos = (vt0->Position + vt1->Position) * 0.5f;
 	Vertex* toInsert = new Vertex(newPos);
-	toInsert->id = 100;
+	toInsert->id = 11;
 	
 	vector<int> fuck1;
 
@@ -344,8 +344,9 @@ void Mesh::edgeCollapse(Edge* edge)
 				{
 					//delete the old edges
 					delete currFace->adjEdges[k];
+			/*		currFace->adjEdges[k]->isActive = false;*/
 				}
-				
+
 				delete vt0->adjFaces[i];
 				break;
 			}
@@ -358,7 +359,7 @@ void Mesh::edgeCollapse(Edge* edge)
 
 		for (int j = 0; j < 3; j++)
 		{
-			delete currFace->adjEdges[j];
+			currFace->adjEdges[j];
 			//change the corresponding vertex of new face to the new vertex
 			if (currFace->adjVertices[j]->id == vt0->id)
 			{
@@ -425,17 +426,27 @@ void Mesh::edgeCollapse(Edge* edge)
 	/*-------------------------------------------------------*/
 	
 	//erase the old vertices
+	//for (int i = 0; i < this->vertices.size(); i++)
+	//{
+
+	//	if (vertices[i]->adjFaces.size()==0)
+	//	{
+	//		vertices.erase(vertices.begin() + i);
+	//	}
+	//}
+	vertices[id1]->isActive = false;
+	vertices[id2]->isActive = false;
+	vector<Vertex*> newVertics;
 	for (int i = 0; i < this->vertices.size(); i++)
 	{
-
-		if (vertices[i]->adjFaces.size()==0)
+		if (vertices[i]->isActive == true) 
 		{
-			vertices.erase(vertices.begin() + i);
+			newVertics.push_back(vertices[i]);
 		}
 	}
 
-	//insert the new vertex
-	this->vertices.push_back(toInsert);
+	newVertics.push_back(toInsert);
+	this->vertices = newVertics;
 	this->numVertics = this->numVertics - 1;
 
 
@@ -517,19 +528,8 @@ void Mesh::edgeCollapse(Edge* edge)
 		}
 	}
 
-	for (int i = 0; i < erasedIndices.size(); i++)
-	{
-		cout << "fuck" << endl;
-		this->indices.erase(indices.begin() + i);
-	}
 
-	for (int i = 0; i < indices.size(); i++)
-	{
-		if (indices[i] == id1 || indices[i] == id2)
-		{
-			indices[i] = numVertics - 1;
-		}
-	}
+	
 
 	//erase the old faces
 	int faceErased = 0;
@@ -540,21 +540,29 @@ void Mesh::edgeCollapse(Edge* edge)
 		{
 			faceErased++;
 			erasedIndex.push_back(i);
-			//faces.erase(faces.begin() + i);
 		}
 	}
-
-
-
-	for (int i = 0; i < erasedIndex.size(); i++)
-	{
-		faces.erase(faces.begin() + erasedIndex[i]);
-	}
+	
+	
+	//for (int i = 0; i < erasedIndex.size(); i++)
+	//{
+	//	faces.erase(faces.begin() + erasedIndex[i]);
+	//}
 
 	//decrease the number of faces
 	this->numFaces = this->numFaces - faceErased;
 
-
+	vector<GLuint> updateIndices;
+	for (int i = 0; i < numFaces; i++)
+	{
+		for (int j = 0; j < 3; j++)
+		{
+			int id = faces[i]->adjVertices[j]->id;
+			updateIndices.push_back(id);
+		}
+	}
+	
+	this->indices = updateIndices;
 	////process the edges of faces
 	//int edgeErased = 0;
 	//erasedIndex.clear();

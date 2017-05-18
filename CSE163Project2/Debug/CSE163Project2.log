@@ -1,11 +1,13 @@
 ﻿  Mesh.cpp
-c:\users\chunc\desktop\coursework\cse\cse163\assignment2\cse163hw2\cse163project2\mesh.cpp(428): warning C4018: '<': signed/unsigned mismatch
-c:\users\chunc\desktop\coursework\cse\cse163\assignment2\cse163hw2\cse163project2\mesh.cpp(444): warning C4018: '<': signed/unsigned mismatch
-c:\users\chunc\desktop\coursework\cse\cse163\assignment2\cse163hw2\cse163project2\mesh.cpp(520): warning C4018: '<': signed/unsigned mismatch
-c:\users\chunc\desktop\coursework\cse\cse163\assignment2\cse163hw2\cse163project2\mesh.cpp(526): warning C4018: '<': signed/unsigned mismatch
-c:\users\chunc\desktop\coursework\cse\cse163\assignment2\cse163hw2\cse163project2\mesh.cpp(537): warning C4018: '<': signed/unsigned mismatch
-c:\users\chunc\desktop\coursework\cse\cse163\assignment2\cse163hw2\cse163project2\mesh.cpp(549): warning C4018: '<': signed/unsigned mismatch
-c:\users\chunc\desktop\coursework\cse\cse163\assignment2\cse163hw2\cse163project2\mesh.cpp(655): warning C4018: '<': signed/unsigned mismatch
-c:\users\chunc\desktop\coursework\cse\cse163\assignment2\cse163hw2\cse163project2\mesh.cpp(692): warning C4018: '<': signed/unsigned mismatch
-  CSE163Project2.vcxproj -> C:\Users\chunc\Desktop\Coursework\CSE\CSE163\Assignment2\CSE163HW2\Debug\CSE163Project2.exe
-  CSE163Project2.vcxproj -> C:\Users\chunc\Desktop\Coursework\CSE\CSE163\Assignment2\CSE163HW2\Debug\CSE163Project2.pdb (Partial PDB)
+c:\users\zigan\desktop\github\cse163\cse163hw2\cse163project2\mesh.cpp(440): warning C4018: '<': signed/unsigned mismatch
+c:\users\zigan\desktop\github\cse163\cse163hw2\cse163project2\mesh.cpp(455): warning C4018: '<': signed/unsigned mismatch
+c:\users\zigan\desktop\github\cse163\cse163hw2\cse163project2\mesh.cpp(537): warning C4018: '<': signed/unsigned mismatch
+c:\users\zigan\desktop\github\cse163\cse163hw2\cse163project2\mesh.cpp(663): warning C4018: '<': signed/unsigned mismatch
+c:\users\zigan\desktop\github\cse163\cse163hw2\cse163project2\mesh.cpp(700): warning C4018: '<': signed/unsigned mismatch
+  Generating Code...
+  Skipping... (no relevant changes detected)
+  main.cpp
+  Shader.cpp
+  Scene.cpp
+  CSE163Project2.vcxproj -> C:\Users\zigan\Desktop\GitHub\CSE163\CSE163HW2\Debug\CSE163Project2.exe
+  CSE163Project2.vcxproj -> C:\Users\zigan\Desktop\GitHub\CSE163\CSE163HW2\Debug\CSE163Project2.pdb (Partial PDB)
