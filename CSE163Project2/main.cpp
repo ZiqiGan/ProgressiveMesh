@@ -61,7 +61,7 @@ int main(int argc, char* argv[])
 	modelView = glm::translate(modelView, glm::vec3(0.0f, -4.0f, -4.0f));
 	modelView = glm::translate(modelView, glm::vec3(sc, sc, sc));
 	mat4 origin = modelView;
-	//myScene.MeshSimplification(50);
+	//myScene.MeshSimplification(20);
 	int maxCollapse = 10;
 	int collapseCount = 0;
 	do
@@ -127,7 +127,10 @@ int main(int argc, char* argv[])
 		}
 		else if (glfwGetKey(window, GLFW_KEY_1) == GLFW_PRESS)
 		{
-			myScene.MeshSimplification(10);
+			if (myScene.object.numFaces != 0)
+			{
+				myScene.MeshSimplification(20);
+			}
 		}
 
 		//set up perspective projection

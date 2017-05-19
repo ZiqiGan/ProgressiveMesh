@@ -78,7 +78,7 @@
     </ClCompile>
     <Link>
       <AdditionalDependencies>opengl32.lib;glew32.lib;glfw3.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <AdditionalLibraryDirectories>C:\Users\zigan\Desktop\glfw-3.2.1.bin.WIN32\lib-vc2015;C:\Users\Public\Desktop\glew-2.0.0\lib\Release\Win32;C:\Users\zigan\Desktop\glfw-3.2.1.bin.WIN32\glfw-3.2.1.bin.WIN32\lib-vc2015;C:\Users\chunc\Desktop\Programing\glew-2.0.0\lib\Release\Win32;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>C:\Users\chunc\Desktop\Programing\glfw-3.2.1.bin.WIN32\lib-vc2015;C:\Users\zigan\Desktop\glfw-3.2.1.bin.WIN32\lib-vc2015;C:\Users\Public\Desktop\glew-2.0.0\lib\Release\Win32;C:\Users\zigan\Desktop\glfw-3.2.1.bin.WIN32\glfw-3.2.1.bin.WIN32\lib-vc2015;C:\Users\chunc\Desktop\Programing\glew-2.0.0\lib\Release\Win32;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">

@@ -5,6 +5,8 @@
 #include <stdlib.h>
 #include <vector> 
 #include <queue>
+#include <unordered_map>
+#include <stack>
 
 #include <glm/glm.hpp>
 #include <glm/gtc/noise.hpp>
@@ -46,7 +48,6 @@ struct Vertex {
 	int id;
 	bool isActive = true;
 
-	vector<Vertex*> adjVertices;
 	vector<Face*> adjFaces;
 	vector<Edge*> adjEdges;
 	Vertex(vec3 pos, int id) {
@@ -60,11 +61,11 @@ struct Vertex {
 };
 
 struct Edge {
+
 	vector<Vertex*> adjVertices;
 	vector<Face*> adjFaces;
-	vector<Edge*> adjEdges;
+
 	float error = 0.0f;
-	bool isValid = false;
 	bool isActive = true;
 	string id;
 	Edge(Vertex* vt1, Vertex* vt2)
@@ -87,11 +88,12 @@ struct Edge {
 };
 
 struct Face {
+
 	vec3 normal;
-	//float area;
+
 	bool isActive = true;
 	vector<Vertex*> adjVertices = vector<Vertex*>(3);
-	vector<Face*> adjFaces;
+
 	vector<Edge*> adjEdges;
 
 	Face(Vertex* vertex1, Vertex* vertex2, Vertex* vertex3)
@@ -116,6 +118,11 @@ struct Light {
 	vec3 color;
 };
 
+struct Data {
+	Edge* e;
+	Vertex* v;
+	vector<Face*> fs;
+};
 
 struct CompareError {
 	bool operator()(Edge* const & e1, Edge* const & e2) {
@@ -129,13 +136,16 @@ class Mesh
 public:
 	vector<Vertex*> vertices;
 	vector<Face*> faces;
-	vector<Edge*> edges;
+	//vector<Edge*> edges;
+	
+	
 	vector<vec3> vtPos;
 	vector<vec3> vtNorms;
 	vector<vec3> faceNorms;
 	vector<GLuint> indices;
 	priority_queue < Edge*, vector<Edge*>, CompareError> weightedEdges;
-
+	vector<Edge*> edges;
+	stack<Data*> datas;
 	int numVertics = 0;
 	int numFaces = 0;
 	int numEdges = 0;
@@ -146,11 +156,13 @@ public:
 	void setupMesh(); 
 	void Draw(Shader shader,mat4 modelview);
 	void edgeCollapse(Edge * edge);
+	Edge * edgeToCollapse();
 	mat4 fundamentalQuadric(float a, float b, float c, float d);
 	void computeVertexError(Vertex * curr);
 	void vertexErrors();
 	void computeEdgeError(Edge * edge);
 	void edgeErrors();
+	void revert(Data * data);
 private:
 	GLuint VAO, VBO,NBO, EBO;
 

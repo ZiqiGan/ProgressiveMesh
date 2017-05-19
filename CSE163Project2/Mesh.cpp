@@ -97,7 +97,7 @@ void Mesh::readFile(const char* filename)
 					this->indices.push_back(vt1);
 					this->indices.push_back(vt2);
 					this->indices.push_back(vt3);
-					//cout << vt1 << " " << vt2 << " " << vt3 << endl;
+				
 					Face *face = new Face(this->vertices[vt1], this->vertices[vt2],
 						this->vertices[vt3]);
 
@@ -113,14 +113,6 @@ void Mesh::readFile(const char* filename)
 					vertices[vt1]->adjFaces.push_back(face);
 					vertices[vt2]->adjFaces.push_back(face);
 					vertices[vt3]->adjFaces.push_back(face);
-
-					//adj vertex for vertex
-					vertices[vt1]->adjVertices.push_back(vertices[vt2]);
-					vertices[vt1]->adjVertices.push_back(vertices[vt3]);
-					vertices[vt2]->adjVertices.push_back(vertices[vt1]);
-					vertices[vt2]->adjVertices.push_back(vertices[vt3]);
-					vertices[vt3]->adjVertices.push_back(vertices[vt1]);
-					vertices[vt3]->adjVertices.push_back(vertices[vt2]);
 					lineCount++;
 				 }
 			}
@@ -139,9 +131,9 @@ void Mesh::processMesh()
 	char buff2[500];
 	sprintf_s(buff2, "Processing Mesh\n");
 	OutputDebugStringA(buff2);
-	unordered_map<string, Edge*> uniqueEdges;
-	//process edge adjacency relationship
 
+	//process edge adjacency relationship
+	unordered_map<string, Edge*> uniqueEdges;
 	for (int i = 0; i < numFaces; i++)
 	{
 		Face* currFace = faces[i];
@@ -149,40 +141,17 @@ void Mesh::processMesh()
 		//each face is assoicated with three edges
 			
 		Edge* edge1 = new Edge(currFace->adjVertices[0], currFace->adjVertices[1]);
-		if (glm::abs(glm::distance(currFace->adjVertices[0]->Position, currFace->adjVertices[1]->Position)) < 0)
-		{
-			edge1->isValid = true;
-		}
-		//adj face for edge
 		edge1->adjFaces.push_back(currFace);
-		//uniqueEdges.insert(std::make_pair(hash<Edge*>{}(edge1), edge1));
 		uniqueEdges.insert(std::make_pair(edge1->id, edge1));
 			
 		Edge* edge2 = new Edge(currFace->adjVertices[1], currFace->adjVertices[2]);
-		if (glm::abs(glm::distance(currFace->adjVertices[1]->Position, currFace->adjVertices[2]->Position)) < 0)
-		{
-			edge1->isValid = true;
-		}
 		edge2->adjFaces.push_back(currFace);
-		//uniqueEdges.insert(std::make_pair(hash<Edge*>{}(edge2), edge2));
 		uniqueEdges.insert(std::make_pair(edge2->id, edge2));
+
 		Edge* edge3 = new Edge(currFace->adjVertices[2], currFace->adjVertices[0]);
-		if (glm::abs(glm::distance(currFace->adjVertices[2]->Position, currFace->adjVertices[0]->Position)) < 0)
-		{
-			edge1->isValid = true;
-		}
 		edge3->adjFaces.push_back(currFace);
-		//uniqueEdges.insert(std::make_pair(hash<Edge*>{}(edge3), edge3));
 		uniqueEdges.insert(std::make_pair(edge3->id, edge3));
 		
-		//adj edge for edge
-		edge1->adjEdges.push_back(edge2);
-		edge1->adjEdges.push_back(edge3);
-		edge2->adjEdges.push_back(edge1);
-		edge2->adjEdges.push_back(edge3);
-		edge3->adjEdges.push_back(edge1);
-		edge3->adjEdges.push_back(edge2);
-
 		//adj edge for vertex
 		currFace->adjVertices[0]->adjEdges.push_back(edge1);
 		currFace->adjVertices[0]->adjEdges.push_back(edge3);
@@ -197,26 +166,13 @@ void Mesh::processMesh()
 		currFace->adjEdges.push_back(edge3);
 	}
 	
-
-
-	//add unique edges into object edges
-	for (auto it = uniqueEdges.begin(); it != uniqueEdges.end(); it++)
+	for (auto itr = uniqueEdges.begin(); itr != uniqueEdges.end(); itr++)
 	{
-		this->edges.push_back(it->second);
+		this->edges.push_back(itr->second);
 	}
 	this->numEdges = edges.size();
-	//cout<<this->numVertics<<" "<<this->numEdges<<endl;
-	for (unsigned int i = 0; i < this->edges.size(); i++)
-	{
-		Edge* currEdge = edges[i];
-		if (currEdge->adjFaces.size() == 2)
-		{
-			currEdge->adjFaces[0]->adjFaces.push_back(currEdge->adjFaces[1]);
-			currEdge->adjFaces[1]->adjFaces.push_back(currEdge->adjFaces[0]);
-		}
-	}
 
-
+	
 	/* per-vertex normals: 
 	 * average normal of faces touching each vertex
 	 */
@@ -241,6 +197,18 @@ void Mesh::processMesh()
 	vertexErrors();
 	edgeErrors();
 	
+	//cout << "shit" << endl;
+	//vector<float> debug;
+	//for (int i = 0; i < numEdges; i++)
+	//{
+	//	debug.push_back(edges[i]->error);
+	//}
+	//std::sort(debug.begin(), debug.end());
+	//for (int i = 0; i < numEdges; i++)
+	//{
+	//	cout << debug[i] << endl;
+	//}
+
 }
 
 void Mesh::setupMesh()
@@ -304,7 +272,7 @@ void Mesh::Draw(Shader shader,mat4 modelview) {
 	glUniform3f(glGetUniformLocation(shader.Program, "light2.color"), 0.5f, 0.5f, 1.0f);
 	glUniform3f(glGetUniformLocation(shader.Program, "light2.position"),light2Pos[0], light2Pos[1], light2Pos[2]);
 	glBindVertexArray(this->VAO);
-	glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+	//glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 	
 	glDrawElements(GL_TRIANGLES, this->indices.size(), GL_UNSIGNED_INT, 0);
 	//glDrawArrays(GL_TRIANGLES, 0,this->vertices.size());
@@ -313,7 +281,7 @@ void Mesh::Draw(Shader shader,mat4 modelview) {
 
 
 void Mesh::edgeCollapse(Edge* edge)
-{	
+{
 	Vertex* vt0 = edge->adjVertices[0];
 	Vertex* vt1 = edge->adjVertices[1];
 	int id1 = vt0->id;
@@ -321,8 +289,8 @@ void Mesh::edgeCollapse(Edge* edge)
 	//create the new vertex on the edge
 	vec3 newPos = (vt0->Position + vt1->Position) * 0.5f;
 	Vertex* toInsert = new Vertex(newPos);
+	//toInsert->id = numVertics - 1;
 	toInsert->id = numVertics-1;
-	
 
 	//process all faces neighboring to vertex 0
 	for (unsigned int i = 0; i < vt0->adjFaces.size(); i++)
@@ -334,12 +302,6 @@ void Mesh::edgeCollapse(Edge* edge)
 			//to process other faces
 			if (currFace->adjVertices[j] == vt1)
 			{
-			
-			/*	for (int k = 0; k < 3; k++)
-				{
-					currFace->adjEdges[k]->isActive = false;
-				}*/
-
 				vt0->adjFaces[i]->isActive = false;
 				break;
 			}
@@ -352,18 +314,6 @@ void Mesh::edgeCollapse(Edge* edge)
 
 		for (int j = 0; j < 3; j++)
 		{
-			//update the adj vertex of modifited edge
-			Edge* temp = currFace->adjEdges[j];
-			
-			if (temp->adjVertices[0]->id == vt0->id)
-			{
-				temp->adjVertices[0] = toInsert;
-			}
-			else if (temp->adjVertices[1]->id == vt0->id)
-			{
-				temp->adjVertices[1] = toInsert;
-			}
-    
 			//change the corresponding vertex of new face to the new vertex
 			if (currFace->adjVertices[j]->id == vt0->id)
 			{
@@ -375,20 +325,21 @@ void Mesh::edgeCollapse(Edge* edge)
 		vec3 edge2 = currFace->adjVertices[2]->Position - currFace->adjVertices[1]->Position;
 		vec3 faceNormal = glm::cross(edge1, edge2);
 		currFace->normal = faceNormal;
-		
+
 		//add adj face to new vertex
 		toInsert->adjFaces.push_back(currFace);
-	
+
 	}
-		
 
-/*---------------------------------------------------*/
 
-	//process all faces neighboring to vertex 1
+	/*---------------------------------------------------*/
+
+		//process all faces neighboring to vertex 1
 	for (unsigned int i = 0; i < vt1->adjFaces.size(); i++)
 	{
+
 		Face* currFace = vt1->adjFaces[i];
-		
+
 		//if if currFace is already degenerated, just continue to 
 		//process other adj faces
 		if (currFace->isActive == false)
@@ -398,17 +349,6 @@ void Mesh::edgeCollapse(Edge* edge)
 
 		for (int j = 0; j < 3; j++)
 		{
-			//update the adj vertex of modifited edge
-			Edge* temp = currFace->adjEdges[j];
-
-			if (temp->adjVertices[0]->id == vt0->id)
-			{
-				temp->adjVertices[0] = toInsert;
-			}
-			else if (temp->adjVertices[1]->id == vt0->id)
-			{
-				temp->adjVertices[1] = toInsert;
-			}
 			//change the corresponding vertex of new face to the new vertex
 			if (currFace->adjVertices[j]->id == vt1->id)
 			{
@@ -425,19 +365,25 @@ void Mesh::edgeCollapse(Edge* edge)
 		//add adj face to new vertex
 		toInsert->adjFaces.push_back(currFace);
 	}
-	
+
 
 	/*-------------------------------------------------------*/
-	
+
+
+	//vertices.push_back(toInsert);
+	//vector<GLuint> newIndices;
+
 	vertices[id1]->isActive = false;
 	vertices[id2]->isActive = false;
+
+
 	vector<Vertex*> newVertics;
 	vector<vec3> newVtPos;
 	vector<vec3> newVtNorms;
 	int index = 0;
 	for (int i = 0; i < this->vertices.size(); i++)
 	{
-		if (vertices[i]->isActive == true) 
+		if (vertices[i]->isActive == true)
 		{
 			newVertics.push_back(vertices[i]);
 			vertices[i]->id = index;
@@ -453,7 +399,7 @@ void Mesh::edgeCollapse(Edge* edge)
 	newVertics.push_back(toInsert);
 	this->vertices = newVertics;
 	this->numVertics = this->numVertics - 1;
-	toInsert->id = numVertics-1;
+	toInsert->id = numVertics - 1;
 
 
 	//erase the old faces
@@ -484,64 +430,92 @@ void Mesh::edgeCollapse(Edge* edge)
 	}
 
 	this->indices = updateIndices;
+	if (numFaces == 0)
+	{
+		return;
+	}
 
-	////update the vertex erros
-	//for (int i = 0; i < toInsert->adjFaces.size(); i++)
-	//{
-	//	Face* temp = toInsert->adjFaces[i];
-	//	for (int j = 0; j < 3; j++)
-	//	{
-	//		computeVertexError(temp->adjVertices[j]);
-	//	}
-	//}
+	//update the vertex erros
+	for (int i = 0; i < toInsert->adjFaces.size(); i++)
+	{
+		Face* temp = toInsert->adjFaces[i];
+		for (int j = 0; j < 3; j++)
+		{
+			computeVertexError(temp->adjVertices[j]);
+		}
+	}
 
-	//TODO: How to update edges efficiently?????
+	for (int i = 0; i < vt0->adjEdges.size(); i++)
+	{
+		Edge* temp = vt0->adjEdges[i];
+		if (temp->adjVertices[0] == vt1 || temp->adjVertices[1] == vt1)
+		{
+		
+			temp->isActive = false;
+		}
+		if (temp->isActive == false)
+		{
+			continue;
+		}
+		if (temp->adjVertices[0] == vt0)
+		{
+			temp->adjVertices[0] = toInsert;
+			computeEdgeError(temp);
+		}
+		else if (temp->adjVertices[1] == vt0)
+		{
+			temp->adjVertices[1] = toInsert;
+			computeEdgeError(temp);
+		}
+		
+		toInsert->adjEdges.push_back(temp);
+	}
 
-	//edge->isActive = false;
-	//vector<Edge*> newEdges;
-	//for (int i = 0; i < numEdges; i++)
-	//{
-	//	if (edges[i]->isActive)
-	//	{
-	//		newEdges.push_back(edges[i]);
-	//	}
-	//}
+	for (int i = 0; i < vt1->adjEdges.size(); i++)
+	{
+		Edge* temp = vt1->adjEdges[i];
+		if (temp->adjVertices[0] == vt0 || temp->adjVertices[1] == vt0)
+		{
 
-	//numEdges = numEdges - 1;
-	//
-	//this->edges = newEdges;
+			temp->isActive = false;
+		}
+		if (temp->isActive == false)
+		{
+			continue;
+		}
+		if (temp->adjVertices[0] == vt1)
+		{
+			temp->adjVertices[0] = toInsert;
+			computeEdgeError(temp);
+		}
+		else if (temp->adjVertices[1] == vt1)
+		{
+			temp->adjVertices[1] = toInsert;
+			computeEdgeError(temp);
+		}
+		
+		toInsert->adjEdges.push_back(temp);
+	}
 
-
-	////calculate the vertex normal for new vertex
-	//vec3 normal = vec3(0);
-	//for (int i = 0; i < toInsert->adjFaces.size(); i++)
-	//{
-	//	normal = normal + toInsert->adjFaces[i]->normal;
-	//}
-	//normal = glm::normalize(normal);
-	//toInsert->Normal = normal;
-
-	////calculate the vertex normals for all the adj vertices of the new vertex
-	//for (int i = 0; i < toInsert->adjVertices.size(); i++)
-	//{
-	//	vec3 normal = vec3(0);
-	//	for (int j = 0; j < toInsert->adjFaces.size(); j++)
-	//	{
-	//		normal = normal + toInsert->adjFaces[i]->normal;
-	//	}
-	//	normal = glm::normalize(normal);
-	//	toInsert->Normal = normal;
-	//	//update the vertex errors of the adj vertices
-	//	computeVertexError(toInsert->adjVertices[i]);
-	//}
-
-	////compute the vertex errors of the new vertex
-	//computeVertexError(toInsert);
 	
 }
 
 
-
+Edge* Mesh::edgeToCollapse()
+{
+	float minError = 10000.0f;
+	int count = 0;
+	for (int i = 0; i < edges.size(); i++)
+	{
+		if (!edges[i]->isActive) continue;
+		if (edges[i]->error < minError)
+		{
+			minError = edges[i]->error;
+			count = i;
+		}
+	}
+	return edges[count];
+}
 
 /*-------------------------------------------------
 Below is the section for calculating Quadric Errors
@@ -550,10 +524,10 @@ Below is the section for calculating Quadric Errors
 //This is the matrix K defined in Section 5 of Garland 97.
 mat4 Mesh::fundamentalQuadric(float a,float b,float c,float d)
 {
-	return glm::mat4(pow(a, 2), a*b, a*c, a*d,
-					 a*b, pow(b, 2), b*c, b*d,
-					 a*c, b*c, pow(c, 2), c*d,
-					 a*d, b*d, c*d, pow(d, 2));
+	return glm::mat4(pow(a, 2.0f), a*b, a*c, a*d,
+					 a*b, pow(b, 2.0f), b*c, b*d,
+					 a*c, b*c, pow(c, 2.0f), c*d,
+					 a*d, b*d, c*d, pow(d, 2.0f));
 }
 
 //compute vertex error metric by accumulating the Quadric of all its 
@@ -590,16 +564,15 @@ void Mesh::computeEdgeError(Edge* edge)
 	mat4 Q2 = edge->adjVertices[1]->Quadric;
 	vec3 v1 = edge->adjVertices[0]->Position;
 	vec3 v2 = edge->adjVertices[1]->Position;
-	float e1 = Q1[0][0] * pow(v1[0], 2) + 2.0f*Q1[0][1] * v1[0] * v1[1] + 2.0f*Q1[0][2] * v1[0] * v1[2]
-		+ 2.0f*Q1[0][3] * v1[0] + Q1[1][1] * pow(v1[1], 2) + 2.0f*Q1[1][2] * v1[1] * v1[2] + 2.0f*Q1[1][3] * v1[2]
-		+ Q1[2][2] * pow(v1[2], 2) + 2 * Q1[2][3] * v1[2] + Q1[3][3];
+	float e1 = Q1[0][0] * pow(v1[0], 2.0f) + 2.0f*Q1[0][1] * v1[0] * v1[1] + 2.0f*Q1[0][2] * v1[0] * v1[2]
+		+ 2.0f*Q1[0][3] * v1[0] + Q1[1][1] * pow(v1[1], 2.0f) + 2.0f*Q1[1][2] * v1[1] * v1[2] + 2.0f*Q1[1][3] * v1[2]
+		+ Q1[2][2] * pow(v1[2], 2.0f) + 2 * Q1[2][3] * v1[2] + Q1[3][3];
 
-	float e2 = Q2[0][0] * pow(v2[0], 2) + 2.0f*Q2[0][1] * v2[0] * v2[1] + 2.0f*Q2[0][2] * v2[0] * v2[2]
-		+ 2.0f*Q2[0][3] * v2[0] + Q2[1][1] * pow(v2[1], 2) + 2.0f*Q2[1][2] * v2[1] * v2[2] + 2.0f*Q2[1][3] * v2[2]
-		+ Q2[2][2] * pow(v2[2], 2) + 2 * Q2[2][3] * v2[2] + Q2[3][3]; 
+	float e2 = Q2[0][0] * pow(v2[0], 2.0f) + 2.0f*Q2[0][1] * v2[0] * v2[1] + 2.0f*Q2[0][2] * v2[0] * v2[2]
+		+ 2.0f*Q2[0][3] * v2[0] + Q2[1][1] * pow(v2[1], 2.0f) + 2.0f*Q2[1][2] * v2[1] * v2[2] + 2.0f*Q2[1][3] * v2[2]
+		+ Q2[2][2] * pow(v2[2], 2.0f) + 2 * Q2[2][3] * v2[2] + Q2[3][3];
 
 	edge->error = e1 + e2;
-	//cout << e1 + e2 << endl;
 }
 
 
@@ -607,22 +580,104 @@ void Mesh::computeEdgeError(Edge* edge)
 //compute error for all pairs
 void Mesh::edgeErrors()
 {
-	for (unsigned int i = 0; i < this->weightedEdges.size(); i++)
+	for (int i = 0; i < edges.size(); i++)
 	{
-		weightedEdges.pop();
+		computeEdgeError(edges[i]);
 	}
 
-	for (unsigned int i = 0; i < numEdges; i++)
-	{
-		computeEdgeError(this->edges[i]);
-		this->weightedEdges.push(edges[i]);
-	
-	}
-	//for (unsigned int i = 0; i < numEdges; i++)
-	//{
-	//	cout << weightedEdges.top()->error << endl;
-	//	weightedEdges.pop();
-	//}
-	
 }
 
+/*-------------------------------------------------
+Below is the section for progressive mesh
+--------------------------------------------------*/
+void Mesh::revert(Data* data)
+{
+	Vertex* vt0 = data->e->adjVertices[0];
+	Vertex* vt1 = data->e->adjVertices[1];
+	Vertex* vtNew = data->v;
+
+	for (int i = 0; i < vt0->adjFaces.size(); i++)
+	{
+		Face* curr = vt0->adjFaces[i];
+		if (curr->isActive == false) continue;
+		for (int j = 0; j < 3; j++)
+		{
+			if (curr->adjVertices[j] == vtNew)
+			{
+				curr->adjVertices[j] = vt0;
+			}
+		}
+		vec3 edge1 = curr->adjVertices[0]->Position - curr->adjVertices[1]->Position;
+		vec3 edge2 = curr->adjVertices[2]->Position - curr->adjVertices[1]->Position;
+		vec3 faceNormal = glm::cross(edge1, edge2);
+		curr->normal = faceNormal;
+	}
+
+	for (int i = 0; i < vt1->adjFaces.size(); i++)
+	{
+		Face* curr = vt1->adjFaces[i];
+		if (curr->isActive == false) continue;
+		for (int j = 0; j < 3; j++)
+		{
+			if (curr->adjVertices[j] == vtNew)
+			{
+				curr->adjVertices[j] = vt1;
+			}
+		}
+		vec3 edge1 = curr->adjVertices[0]->Position - curr->adjVertices[1]->Position;
+		vec3 edge2 = curr->adjVertices[2]->Position - curr->adjVertices[1]->Position;
+		vec3 faceNormal = glm::cross(edge1, edge2);
+		curr->normal = faceNormal;
+	}
+
+	for (int i = 0; i < vt0->adjFaces.size(); i++)
+	{
+		for (int j = 0; j < 3; j++)
+		{
+			computeVertexError(vt0->adjFaces[i]->adjVertices[j]);
+		}
+	}
+
+	for (int i = 0; i < vt1->adjFaces.size(); i++)
+	{
+		for (int j = 0; j < 3; j++)
+		{
+			computeVertexError(vt1->adjFaces[i]->adjVertices[j]);
+		}
+	}
+
+	for (int i = 0; i < data->fs.size(); i++)
+	{
+		data->fs[i]->isActive = true;
+	}
+
+	for (int i = 0; i < vt0->adjEdges.size(); i++)
+	{
+		Edge* temp = vt0->adjEdges[i];
+		temp->isActive = true;
+		if (temp->adjVertices[0] == vtNew)
+		{
+			temp->adjVertices[0] = vt0;
+		}
+		else if (temp->adjVertices[1] == vtNew)
+		{
+			temp->adjVertices[1] = vt0;
+		}
+		computeEdgeError(temp);
+	}
+
+	for (int i = 0; i < vt1->adjEdges.size(); i++)
+	{
+		Edge* temp = vt1->adjEdges[i];
+		temp->isActive = true;
+		if (temp->adjVertices[0] == vtNew)
+		{
+			temp->adjVertices[0] = vt1;
+		}
+		else if (temp->adjVertices[1] == vtNew)
+		{
+			temp->adjVertices[1] = vt1;
+		}
+		computeEdgeError(temp);
+	}
+}
