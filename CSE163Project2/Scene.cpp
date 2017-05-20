@@ -47,13 +47,9 @@ void Scene::MeshSimplification(int level)
 	{
 	
 			Edge* shit = object.edgeToCollapse();
-			std::cout << shit->error << std::endl;
+			//std::cout << shit->error << std::endl;
 			object.edgeCollapse(shit);
-			
-			if (object.numFaces == 0)
-			{
-				return;
-			}
+
 			//cout << "--------------------------------------------" << endl;
 			//vector<float> debug;
 			//for (int i = 0; i < object.numEdges; i++)
@@ -73,6 +69,16 @@ void Scene::MeshSimplification(int level)
 	
 	}
 } 
+
+void Scene::ProgressiveMesh(int level)
+{
+	for (int i = 0; i < level; i++)
+	{
+		Data* toRestore = object.datas.top();
+		object.datas.pop();
+		object.revert(toRestore);
+	}
+}
 
 
 Scene::~Scene()
