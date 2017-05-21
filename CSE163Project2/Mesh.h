@@ -61,12 +61,12 @@ struct Vertex {
 };
 
 struct Edge {
-
+	bool isActive = true;
 	vector<Vertex*> adjVertices;
 	vector<Face*> adjFaces;
 
 	float error = 0.0f;
-	bool isActive = true;
+
 	string id;
 	Edge(Vertex* vt1, Vertex* vt2)
 	{
@@ -141,14 +141,15 @@ public:
 	
 	vector<vec3> vtPos;
 	vector<vec3> vtNorms;
-	vector<vec3> faceNorms;
+	//vector<vec3> faceNorms;
 	vector<GLuint> indices;
-	priority_queue < Edge*, vector<Edge*>, CompareError> weightedEdges;
+	//priority_queue < Edge*, vector<Edge*>, CompareError> weightedEdges;
 	vector<Edge*> edges;
 	stack<Data*> datas;
 	int numVertics = 0;
 	int numFaces = 0;
 	int numEdges = 0;
+	int initialFaces = 0;
 	Material mtl;
 	Mesh();   
 	void readFile(const char* filename);

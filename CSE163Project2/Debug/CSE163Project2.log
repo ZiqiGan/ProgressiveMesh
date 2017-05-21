@@ -1,7 +1,18 @@
-﻿  main.cpp
-c:\users\chunc\desktop\coursework\cse\cse163\assignment2\cse163hw2\cse163project2\transform.h(14): warning C4305: 'initializing': truncation from 'double' to 'float'
-c:\program files (x86)\windows kits\8.1\include\shared\minwindef.h(130): warning C4005: 'APIENTRY': macro redefinition
-  c:\users\chunc\desktop\coursework\cse\cse163\assignment2\cse163hw2\packages\glfw.3.2.1\build\native\include\glfw\glfw3.h(98): note: see previous definition of 'APIENTRY'
-c:\users\chunc\desktop\coursework\cse\cse163\assignment2\cse163hw2\cse163project2\main.cpp(71): warning C4305: 'argument': truncation from 'double' to 'GLclampf'
+﻿  Mesh.cpp
+c:\users\chunc\desktop\coursework\cse\cse163\assignment2\cse163hw2\cse163project2\mesh.cpp(592): warning C4018: '<': signed/unsigned mismatch
+c:\users\chunc\desktop\coursework\cse\cse163\assignment2\cse163hw2\cse163project2\mesh.cpp(614): warning C4018: '<': signed/unsigned mismatch
+c:\users\chunc\desktop\coursework\cse\cse163\assignment2\cse163hw2\cse163project2\mesh.cpp(624): warning C4018: '<': signed/unsigned mismatch
+c:\users\chunc\desktop\coursework\cse\cse163\assignment2\cse163hw2\cse163project2\mesh.cpp(649): warning C4018: '<': signed/unsigned mismatch
+c:\users\chunc\desktop\coursework\cse\cse163\assignment2\cse163hw2\cse163project2\mesh.cpp(682): warning C4018: '<': signed/unsigned mismatch
+c:\users\chunc\desktop\coursework\cse\cse163\assignment2\cse163hw2\cse163project2\mesh.cpp(727): warning C4018: '<': signed/unsigned mismatch
+c:\users\chunc\desktop\coursework\cse\cse163\assignment2\cse163hw2\cse163project2\mesh.cpp(760): warning C4018: '<': signed/unsigned mismatch
+c:\users\chunc\desktop\coursework\cse\cse163\assignment2\cse163hw2\cse163project2\mesh.cpp(929): warning C4018: '<': signed/unsigned mismatch
+c:\users\chunc\desktop\coursework\cse\cse163\assignment2\cse163hw2\cse163project2\mesh.cpp(946): warning C4018: '<': signed/unsigned mismatch
+c:\users\chunc\desktop\coursework\cse\cse163\assignment2\cse163hw2\cse163project2\mesh.cpp(963): warning C4018: '<': signed/unsigned mismatch
+c:\users\chunc\desktop\coursework\cse\cse163\assignment2\cse163hw2\cse163project2\mesh.cpp(971): warning C4018: '<': signed/unsigned mismatch
+c:\users\chunc\desktop\coursework\cse\cse163\assignment2\cse163hw2\cse163project2\mesh.cpp(979): warning C4018: '<': signed/unsigned mismatch
+c:\users\chunc\desktop\coursework\cse\cse163\assignment2\cse163hw2\cse163project2\mesh.cpp(988): warning C4018: '<': signed/unsigned mismatch
+c:\users\chunc\desktop\coursework\cse\cse163\assignment2\cse163hw2\cse163project2\mesh.cpp(1004): warning C4018: '<': signed/unsigned mismatch
+c:\users\chunc\desktop\coursework\cse\cse163\assignment2\cse163hw2\cse163project2\mesh.cpp(1025): warning C4018: '<': signed/unsigned mismatch
   CSE163Project2.vcxproj -> C:\Users\chunc\Desktop\Coursework\CSE\CSE163\Assignment2\CSE163HW2\Debug\CSE163Project2.exe
   CSE163Project2.vcxproj -> C:\Users\chunc\Desktop\Coursework\CSE\CSE163\Assignment2\CSE163HW2\Debug\CSE163Project2.pdb (Partial PDB)

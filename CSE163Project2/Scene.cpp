@@ -34,39 +34,11 @@ void Scene::render(const mat4 & projection, const mat4 & modelview)
 
 void Scene::MeshSimplification(int level)
 {
-//	/*Edge* toCollapse = object.edgeToCollapse();
-//	object.edgeCollapse(toCollapse);
-//	toCollapse = object.edgeToCollapse();
-//	object.edgeCollapse(toCollapse);
-//	toCollapse = object.edgeToCollapse();
-//	object.edgeCollapse(toCollapse);
-//*/
-//	Edge* shit = object.edges[3];
-//	object.edgeCollapse(shit);
+
 	for (int i = 0; i < level; i++)
 	{
-	
-			Edge* shit = object.edgeToCollapse();
-			//std::cout << shit->error << std::endl;
-			object.edgeCollapse(shit);
-
-			//cout << "--------------------------------------------" << endl;
-			//vector<float> debug;
-			//for (int i = 0; i < object.numEdges; i++)
-			//{
-			//	if (object.edges[i]->isActive)
-			//	{
-			//		debug.push_back(object.edges[i]->error);
-
-			//	}
-			//}
-			//std::sort(debug.begin(), debug.end());
-			//for (int i = 0; i < debug.size(); i++)
-			//{
-			//	
-			//	cout << debug[i] << endl;
-			//}
-	
+		Edge* shit = object.edgeToCollapse();
+		object.edgeCollapse(shit);
 	}
 } 
 
@@ -74,9 +46,12 @@ void Scene::ProgressiveMesh(int level)
 {
 	for (int i = 0; i < level; i++)
 	{
-		Data* toRestore = object.datas.top();
-		object.datas.pop();
-		object.revert(toRestore);
+		if (object.datas.size()>0)
+		{
+			Data* toRestore = object.datas.top();
+			object.datas.pop();
+			object.revert(toRestore);
+		}
 	}
 }
 
