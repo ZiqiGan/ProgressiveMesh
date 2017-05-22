@@ -135,15 +135,13 @@ class Mesh
 {
 public:
 	vector<Vertex*> vertices;
-	vector<Face*> faces;
-	//vector<Edge*> edges;
-	
+	vector<Face*> faces;	
 	
 	vector<vec3> vtPos;
 	vector<vec3> vtNorms;
-	//vector<vec3> faceNorms;
+	vector<vec3> randomColors;
 	vector<GLuint> indices;
-	//priority_queue < Edge*, vector<Edge*>, CompareError> weightedEdges;
+
 	vector<Edge*> edges;
 	stack<Data*> datas;
 	int numVertics = 0;
@@ -155,7 +153,7 @@ public:
 	void readFile(const char* filename);
 	void processMesh();
 	void setupMesh(); 
-	void Draw(Shader shader,mat4 modelview);
+	void Draw(Shader shader,mat4 modelview,mat4 projection);
 	void edgeCollapse(Edge * edge);
 	Edge * edgeToCollapse();
 	mat4 fundamentalQuadric(float a, float b, float c, float d);
@@ -164,6 +162,7 @@ public:
 	void computeEdgeError(Edge * edge);
 	void edgeErrors();
 	void revert(Data * data);
+
 private:
 	GLuint VAO, VBO,NBO, EBO;
 

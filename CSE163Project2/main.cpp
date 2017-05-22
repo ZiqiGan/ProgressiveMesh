@@ -4,11 +4,23 @@
 #include <GLFW/glfw3.h>
 #include <Windows.h>
 
+void printUsage()
+{
+	std::cout << "\npress 'h' to print this message again.\n"
+		<< "press arrows for rotation\n"
+		<< "press 'w' 'a' 's' 'd' for translation\n"
+		<< "press 'i' 'o' to zoom in or zoom out\n"
+		<< "press 'p' to switch to glPolygonMode, press 'm' to switch back\n"
+		<< "press 'r' to reset the transformations.\n"
+		<< "press '1' to perfrom mesh simplification.\n"
+		<< "press '2' to perfrom progressive mesh\n"
+		<< "press ESC to quit.\n";
+}
 int main(int argc, char* argv[])
 {
-	if (argc < 2)
+	if (argc < 3)
 	{
-		cerr << "Please add a filename\n" << endl;
+		cerr << "Please add a filename and/or step size" << endl;
 		exit(-1);
 	}
 
@@ -61,10 +73,9 @@ int main(int argc, char* argv[])
 	modelView = glm::translate(modelView, glm::vec3(0.0f, -4.0f, -4.0f));
 	modelView = glm::translate(modelView, glm::vec3(sc, sc, sc));
 	mat4 origin = modelView;
-	//myScene.MeshSimplification(2);
-	//myScene.ProgressiveMesh(5);
-	int maxCollapse = 10;
-	int collapseCount = 0;
+	int levelOfCollapse = stoi(argv[2]);
+	int usePolygon = 0;
+	int useRandColor = 0;
 	do
 	{
 		glfwPollEvents();
@@ -119,7 +130,6 @@ int main(int argc, char* argv[])
 		}
 		else if (glfwGetKey(window, GLFW_KEY_I) == GLFW_PRESS)
 		{
-			//sc += 0.0005;
 			sc += 0.003f;
 		}
 		else if (glfwGetKey(window, GLFW_KEY_O) == GLFW_PRESS)
@@ -130,23 +140,42 @@ int main(int argc, char* argv[])
 		{
 			if (myScene.object.numFaces > 0)
 			{
-				myScene.MeshSimplification(1);
+				myScene.MeshSimplification(levelOfCollapse);
 			}
 		}
 		else if (glfwGetKey(window, GLFW_KEY_2) == GLFW_PRESS)
 		{
 			if (myScene.object.numFaces < myScene.object.initialFaces)
 			{
-				myScene.ProgressiveMesh(1);
+				myScene.ProgressiveMesh(levelOfCollapse);
 			}
 		}
+		else if (glfwGetKey(window, GLFW_KEY_P) == GLFW_PRESS)
+		{
+			usePolygon = 1;
+		}
+		else if(glfwGetKey(window, GLFW_KEY_M)==GLFW_PRESS)
+		{
+			usePolygon = 0;
+		}
+		else if (glfwGetKey(window, GLFW_KEY_H) == GLFW_PRESS)
+		{
+			printUsage();
+		}
 
-		//set up perspective projection
-		
+		if (usePolygon == 1)
+		{
+			glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+		}
+		else
+		{
+			glPolygonMode(GL_FRONT_AND_BACK,GL_FILL);
+		}
 		modelView = glm::lookAt(eye, center, up);
 		modelView = glm::translate(modelView, vec3(tx, ty, tz));
 		modelView = glm::scale(modelView, vec3(sc, sc, sc));
 		myScene.render(projection, modelView);
+
 		glfwSwapBuffers(window);
 	} while (glfwGetKey(window, GLFW_KEY_ESCAPE) != GLFW_PRESS && !glfwWindowShouldClose(window));
 	glfwTerminate();

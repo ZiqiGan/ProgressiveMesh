@@ -4,6 +4,7 @@
 #include <Windows.h>
 #include <fstream>
 #include <unordered_map>
+#include <stdlib.h>
 
 using namespace std;
 bool readvals(stringstream &s, const int numvals, GLfloat* values)
@@ -20,7 +21,7 @@ bool readvals(stringstream &s, const int numvals, GLfloat* values)
 	return true;
 }
 
-//TODO: Modify this part
+
 std::vector<std::string>& split(const std::string &s, char delim, std::vector<std::string> &elems)
 {
 	std::stringstream ss(s);
@@ -235,7 +236,7 @@ void Mesh::setupMesh()
 }
 
 
-void Mesh::Draw(Shader shader,mat4 modelview) {
+void Mesh::Draw(Shader shader,mat4 modelview,mat4 projection) {
 	GLuint diffuseNr = 1;
 	GLuint specularNr = 1;
 	
@@ -259,228 +260,11 @@ void Mesh::Draw(Shader shader,mat4 modelview) {
 	glUniform3f(glGetUniformLocation(shader.Program, "light2.color"), 0.5f, 0.5f, 1.0f);
 	glUniform3f(glGetUniformLocation(shader.Program, "light2.position"),light2Pos[0], light2Pos[1], light2Pos[2]);
 	glBindVertexArray(this->VAO);
-	glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+	//glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 	
 	glDrawElements(GL_TRIANGLES, this->indices.size(), GL_UNSIGNED_INT, 0);
 	//glDrawArrays(GL_TRIANGLES, 0,this->vertices.size());
 }
-//
-//void Mesh::edgeCollapse(Edge* edge)
-//{
-//	Data* collapseData = new Data();
-//	Vertex* vt0 = edge->adjVertices[0];
-//	Vertex* vt1 = edge->adjVertices[1];
-//	int id1 = vt0->id;
-//	int id2 = vt1->id;
-//	//create the new vertex on the edge
-//	vec3 newPos = (vt0->Position + vt1->Position) * 0.5f;
-//	Vertex* toInsert = new Vertex(newPos);
-//	toInsert->id = numVertics-2;
-//
-//
-//	int faceErased = 0;
-//	//process all faces neighboring to vertex 0
-//	for (unsigned int i = 0; i < vt0->adjFaces.size(); i++)
-//	{
-//		Face* currFace = vt0->adjFaces[i];
-//		for (int j = 0; j < 3; j++)
-//		{
-//			//if curr face is degenerated, deactive it and continue 
-//			//to process other faces
-//			if (currFace->adjVertices[j] == vt1)
-//			{
-//				faceErased++;
-//				currFace->isActive = false;
-//				collapseData->fs.push_back(currFace);
-//				break;
-//			}
-//		}
-//
-//		if (currFace->isActive == false)
-//		{
-//			continue;
-//		}
-//
-//		for (int j = 0; j < 3; j++)
-//		{
-//			//change the corresponding vertex of new face to the new vertex
-//			if (currFace->adjVertices[j]->id == vt0->id)
-//			{
-//				currFace->adjVertices[j] = toInsert;
-//			}
-//		}
-//		//calculate the new face normal
-//		vec3 edge1 = currFace->adjVertices[0]->Position - currFace->adjVertices[1]->Position;
-//		vec3 edge2 = currFace->adjVertices[2]->Position - currFace->adjVertices[1]->Position;
-//		vec3 faceNormal = glm::normalize(glm::cross(edge1, edge2));
-//		//vec3 faceNormal = glm::normalize(glm::cross(edge1, edge2));
-//		currFace->normal = faceNormal;
-//
-//		//add adj face to new vertex
-//		toInsert->adjFaces.push_back(currFace);
-//
-//	}
-//
-//	collapseData->e = edge;
-//	collapseData->v = toInsert;
-//	this->datas.push(collapseData);
-//	/*---------------------------------------------------*/
-//
-//	//process all faces neighboring to vertex 1
-//	for (unsigned int i = 0; i < vt1->adjFaces.size(); i++)
-//	{
-//
-//		Face* currFace = vt1->adjFaces[i];
-//
-//		//if if currFace is already degenerated, just continue to 
-//		//process other adj faces
-//		if (currFace->isActive == false)
-//		{
-//			continue;
-//		}
-//
-//		for (int j = 0; j < 3; j++)
-//		{
-//			//change the corresponding vertex of new face to the new vertex
-//			if (currFace->adjVertices[j]->id == vt1->id)
-//			{
-//				currFace->adjVertices[j] = toInsert;
-//			}
-//		}
-//
-//		//calculate the new face normal
-//		vec3 edge1 = currFace->adjVertices[0]->Position - currFace->adjVertices[1]->Position;
-//		vec3 edge2 = currFace->adjVertices[2]->Position - currFace->adjVertices[1]->Position;
-//		vec3 faceNormal = glm::normalize(glm::cross(edge1, edge2));
-//		//vec3 faceNormal = glm::cross(edge1, edge2);
-//		currFace->normal = faceNormal;
-//
-//		//add adj face to new vertex
-//		toInsert->adjFaces.push_back(currFace);
-//	}
-//
-//
-//
-//
-//	/*-------------------------------------------------------*/
-//
-//	vertices[id1]->isActive = false;
-//	vertices[id2]->isActive = false;
-//
-//	//this->vtPos.push_back(toInsert->Position);
-//	//this->vtNorms.push_back(vec3(1.0f, 1.0f, 1.0f));
-//
-//	vector<Vertex*> newVertics;
-//	vector<vec3> newVtPos;
-//	vector<vec3> newVtNorms;
-//	int index = 0;
-//
-//
-//
-//	for (int i = 0; i < this->vertices.size(); i++)
-//	{
-//		if (vertices[i]->isActive == true)
-//		{
-//			newVertics.push_back(vertices[i]);
-//			vertices[i]->id = index;
-//			newVtPos.push_back(vertices[i]->Position);
-//			newVtNorms.push_back(vec3(1.0f, 1.0f, 1.0f));
-//			index++;
-//		}
-//	}
-//	newVtPos.push_back(toInsert->Position);
-//	newVtNorms.push_back(toInsert->Normal);
-//	this->vtPos = newVtPos;
-//	this->vtNorms = newVtNorms;
-//	newVertics.push_back(toInsert);
-//	this->vertices = newVertics;
-//	this->numVertics = this->numVertics - 1;
-//
-//	vector<GLuint> updateIndices;
-//	for (int i = 0; i < faces.size(); i++)
-//	{
-//		if (!faces[i]->isActive)
-//		{
-//			continue;
-//		}
-//		for (int j = 0; j < 3; j++)
-//		{
-//			int id = faces[i]->adjVertices[j]->id;
-//			updateIndices.push_back(id);
-//		}
-//	}
-//
-//	this->numFaces = numFaces - faceErased;
-//	this->indices = updateIndices;
-//
-//	if (numFaces <= 0)
-//	{
-//		return;
-//	}
-//
-//	//update the vertex errors
-//	for (int i = 0; i < toInsert->adjFaces.size(); i++)
-//	{
-//		Face* temp = toInsert->adjFaces[i];
-//		for (int j = 0; j < 3; j++)
-//		{
-//			computeVertexError(temp->adjVertices[j]);
-//		}
-//	}
-//
-//
-//	for (int i = 0; i < vt0->adjEdges.size(); i++)
-//	{
-//		Edge* temp = vt0->adjEdges[i];
-//		if (temp->adjVertices[0] == vt1 || temp->adjVertices[1] == vt1)
-//		{
-//			temp->isActive = false;
-//		}
-//		if (temp->isActive == false)
-//		{
-//			continue;
-//		}
-//		if (temp->adjVertices[0] == vt0)
-//		{
-//			temp->adjVertices[0] = toInsert;
-//			computeEdgeError(temp);
-//		}
-//		else if (temp->adjVertices[1] == vt0)
-//		{
-//			temp->adjVertices[1] = toInsert;
-//			computeEdgeError(temp);
-//		}
-//
-//		toInsert->adjEdges.push_back(temp);
-//	}
-//
-//	for (int i = 0; i < vt1->adjEdges.size(); i++)
-//	{
-//		Edge* temp = vt1->adjEdges[i];
-//		if (temp->adjVertices[0] == vt0 || temp->adjVertices[1] == vt0)
-//		{
-//
-//			temp->isActive = false;
-//		}
-//		if (temp->isActive == false)
-//		{
-//			continue;
-//		}
-//		if (temp->adjVertices[0] == vt1)
-//		{
-//			temp->adjVertices[0] = toInsert;
-//			computeEdgeError(temp);
-//		}
-//		else if (temp->adjVertices[1] == vt1)
-//		{
-//			temp->adjVertices[1] = toInsert;
-//			computeEdgeError(temp);
-//		}
-//
-//		toInsert->adjEdges.push_back(temp);
-//	}
-//
-//}
 
 void Mesh::edgeCollapse(Edge* edge)
 {
@@ -767,155 +551,6 @@ void Mesh::edgeErrors()
 /*-------------------------------------------------
 Below is the section for progressive mesh
 --------------------------------------------------*/
-
-//void Mesh::revert(Data* data)
-//{
-//	Vertex* vt0 = data->e->adjVertices[0];
-//	Vertex* vt1 = data->e->adjVertices[1];
-//	Vertex* vtNew = data->v;
-//
-//	for (int i = 0; i < vt0->adjFaces.size(); i++)
-//	{
-//		Face* curr = vt0->adjFaces[i];
-//		if (curr->isActive == false) continue;
-//		for (int j = 0; j < 3; j++)
-//		{
-//			if (curr->adjVertices[j] == vtNew)
-//			{
-//				curr->adjVertices[j] = vt0;
-//			}
-//		}
-//		vec3 edge1 = curr->adjVertices[0]->Position - curr->adjVertices[1]->Position;
-//		vec3 edge2 = curr->adjVertices[2]->Position - curr->adjVertices[1]->Position;
-//		vec3 faceNormal = glm::normalize(glm::cross(edge1, edge2));
-//		curr->normal = faceNormal;
-//	}
-//
-//	for (int i = 0; i < vt1->adjFaces.size(); i++)
-//	{
-//		Face* curr = vt1->adjFaces[i];
-//		if (curr->isActive == false) continue;
-//		for (int j = 0; j < 3; j++)
-//		{
-//			if (curr->adjVertices[j] == vtNew)
-//			{
-//				curr->adjVertices[j] = vt1;
-//			}
-//		}
-//		vec3 edge1 = curr->adjVertices[0]->Position - curr->adjVertices[1]->Position;
-//		vec3 edge2 = curr->adjVertices[2]->Position - curr->adjVertices[1]->Position;
-//		vec3 faceNormal = glm::normalize(glm::cross(edge1, edge2));
-//		curr->normal = faceNormal;
-//	}
-//
-//	for (int i = 0; i < vt0->adjFaces.size(); i++)
-//	{
-//		for (int j = 0; j < 3; j++)
-//		{
-//			computeVertexError(vt0->adjFaces[i]->adjVertices[j]);
-//		}
-//	}
-//
-//	for (int i = 0; i < vt1->adjFaces.size(); i++)
-//	{
-//		for (int j = 0; j < 3; j++)
-//		{
-//			computeVertexError(vt1->adjFaces[i]->adjVertices[j]);
-//		}
-//	}
-//
-//	for (int i = 0; i < data->fs.size(); i++)
-//	{
-//		data->fs[i]->isActive = true;
-//	}
-//
-//
-//	auto itr = this->vertices.begin();
-//
-//	this->vertices.insert(itr + vt0->id, vt0);
-//	vt0->isActive = true;
-//	itr = vertices.begin();
-//	this->vertices.insert(itr + vt1->id, vt1);
-//	vt1->isActive = true;
-//
-//	vertices.pop_back();
-//
-//	vector<vec3> updatedPos;
-//	vector<vec3> updatedNorms;
-//	for (int i = 0; i < vertices.size(); i++)
-//	{
-//		vertices[i]->id = i;
-//		updatedPos.push_back(vertices[i]->Position);
-//		updatedNorms.push_back(vec3(1.0f, 1.0f, 1.0f));
-//	}
-//
-//	//this->vertices = updatedVertices;
-//	this->numVertics++;
-//	this->numFaces = numFaces + data->fs.size();
-//	this->vtPos = updatedPos;
-//	this->vtNorms = updatedNorms;
-//	//update indices
-//	vector<GLuint> updateIndices;
-//	for (int i = 0; i < faces.size(); i++)
-//	{
-//		if (!faces[i]->isActive)
-//		{
-//			continue;
-//		}
-//		for (int j = 0; j < 3; j++)
-//		{
-//			int id = faces[i]->adjVertices[j]->id;
-//			updateIndices.push_back(id);
-//		}
-//	}
-//	this->indices = updateIndices;
-//
-//
-//	//update edge errors;
-//	for (int i = 0; i < vt0->adjEdges.size(); i++)
-//	{
-//		Edge* temp = vt0->adjEdges[i];
-//
-//		if (temp->adjVertices[0] == vtNew)
-//		{
-//			temp->adjVertices[0] = vt0;
-//			temp->isActive = true;
-//		}
-//		else if (temp->adjVertices[1] == vtNew)
-//		{
-//			temp->adjVertices[1] = vt0;
-//			temp->isActive = true;
-//		}
-//		else
-//		{
-//			continue;
-//		}
-//		computeEdgeError(temp);
-//	}
-//
-//	for (int i = 0; i < vt1->adjEdges.size(); i++)
-//	{
-//		Edge* temp = vt1->adjEdges[i];
-//
-//		if (temp->adjVertices[0] == vtNew)
-//		{
-//			temp->adjVertices[0] = vt1;
-//			temp->isActive = true;
-//		}
-//		else if (temp->adjVertices[1] == vtNew)
-//		{
-//			temp->adjVertices[1] = vt1;
-//			temp->isActive = true;
-//		}
-//		else {
-//			continue;
-//		}
-//		computeEdgeError(temp);
-//	}
-//
-//}
-
-
 
 void Mesh::revert(Data* data)
 {

@@ -6,6 +6,7 @@ layout (location = 2) in vec2 texCoords;
 out vec3 FragPos;
 out vec3 myNormal;
 
+
 uniform mat4 modelview;
 uniform mat4 projection;
 
