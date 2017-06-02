@@ -115,12 +115,16 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <None Include="em.frag.glsl" />
     <None Include="packages.config" />
-    <None Include="shader.frag" />
-    <None Include="shader.vs" />
+    <None Include="shader.frag.glsl" />
+    <None Include="shader.vs.glsl" />
+    <None Include="skybox.frag.glsl" />
+    <None Include="skybox.vs.glsl" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="globals.h" />
+    <ClInclude Include="image.h" />
     <ClInclude Include="Mesh.h" />
     <ClInclude Include="Scene.h" />
     <ClInclude Include="Shader.h" />

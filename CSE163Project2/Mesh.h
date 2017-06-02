@@ -36,9 +36,6 @@ using glm::quat;
 using namespace std;
 
 struct Vertex;
-struct Edge;
-struct Face;
-
 
 //define vertex structure
 struct Vertex {
@@ -47,9 +44,7 @@ struct Vertex {
 	glm::mat4 Quadric = mat4(0);
 	int id;
 	bool isActive = true;
-
-	vector<Face*> adjFaces;
-	vector<Edge*> adjEdges;
+	vector<vec3 > adjFacesNormals;
 	Vertex(vec3 pos, int id) {
 		this->Position = pos;
 		this->id = id;
@@ -57,50 +52,6 @@ struct Vertex {
 	Vertex(vec3 pos)
 	{
 		this->Position = pos;
-	}
-};
-
-struct Edge {
-	bool isActive = true;
-	vector<Vertex*> adjVertices;
-	vector<Face*> adjFaces;
-
-	float error = 0.0f;
-
-	string id;
-	Edge(Vertex* vt1, Vertex* vt2)
-	{
-		if (vt1->id <= vt2->id)
-		{
-			adjVertices.push_back(vt1);
-			adjVertices.push_back(vt2);
-			id = to_string(adjVertices[0]->id) + to_string(adjVertices[1]->id);
-		
-		}
-		else
-		{
-			adjVertices.push_back(vt2);
-			adjVertices.push_back(vt1);
-			id = to_string(adjVertices[0]->id) + to_string(adjVertices[1]->id);
-		}
-	}
-
-};
-
-struct Face {
-
-	vec3 normal;
-
-	bool isActive = true;
-	vector<Vertex*> adjVertices = vector<Vertex*>(3);
-
-	vector<Edge*> adjEdges;
-
-	Face(Vertex* vertex1, Vertex* vertex2, Vertex* vertex3)
-	{
-		adjVertices[0] = vertex1;
-		adjVertices[1] = vertex2;
-		adjVertices[2] = vertex3;
 	}
 };
 
@@ -114,54 +65,25 @@ struct Material {
 
 //define Light Structure
 struct Light {
-	vec3 position;
-	vec3 color;
+	vec4 position;
+	vec4 color;
 };
 
-struct Data {
-	Edge* e;
-	Vertex* v;
-	vector<Face*> fs;
-};
-
-struct CompareError {
-	bool operator()(Edge* const & e1, Edge* const & e2) {
-		// return "true" if "p1" is ordered before "p2", for example:
-		return e1->error > e2->error;
-	}
-};
 
 class Mesh
 {
 public:
-	vector<Vertex*> vertices;
-	vector<Face*> faces;	
-	
+	vector<Vertex*> vertices;	
+	vector<GLuint> indices;
 	vector<vec3> vtPos;
 	vector<vec3> vtNorms;
-	vector<vec3> randomColors;
-	vector<GLuint> indices;
-
-	vector<Edge*> edges;
-	stack<Data*> datas;
-	int numVertics = 0;
-	int numFaces = 0;
-	int numEdges = 0;
-	int initialFaces = 0;
+	int numVertices;
 	Material mtl;
 	Mesh();   
 	void readFile(const char* filename);
-	void processMesh();
 	void setupMesh(); 
 	void Draw(Shader shader,mat4 modelview,mat4 projection);
-	void edgeCollapse(Edge * edge);
-	Edge * edgeToCollapse();
-	mat4 fundamentalQuadric(float a, float b, float c, float d);
-	void computeVertexError(Vertex * curr);
-	void vertexErrors();
-	void computeEdgeError(Edge * edge);
-	void edgeErrors();
-	void revert(Data * data);
+
 
 private:
 	GLuint VAO, VBO,NBO, EBO;

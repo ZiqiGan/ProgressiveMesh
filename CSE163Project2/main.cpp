@@ -18,7 +18,7 @@ void printUsage()
 }
 int main(int argc, char* argv[])
 {
-	if (argc < 3)
+	if (argc < 2)
 	{
 		cerr << "Please add a filename and/or step size" << endl;
 		exit(-1);
@@ -72,10 +72,6 @@ int main(int argc, char* argv[])
 	float sc = 0.2f;
 	modelView = glm::translate(modelView, glm::vec3(0.0f, -4.0f, -4.0f));
 	modelView = glm::translate(modelView, glm::vec3(sc, sc, sc));
-	mat4 origin = modelView;
-	int levelOfCollapse = stoi(argv[2]);
-	int usePolygon = 0;
-	int useRandColor = 0;
 	do
 	{
 		glfwPollEvents();
@@ -136,46 +132,15 @@ int main(int argc, char* argv[])
 		{
 			sc -= 0.003f;
 		}
-		else if (glfwGetKey(window, GLFW_KEY_1) == GLFW_PRESS)
-		{
-			if (myScene.object.numFaces > 0)
-			{
-				myScene.MeshSimplification(levelOfCollapse);
-			}
-		}
-		else if (glfwGetKey(window, GLFW_KEY_2) == GLFW_PRESS)
-		{
-			if (myScene.object.numFaces < myScene.object.initialFaces)
-			{
-				myScene.ProgressiveMesh(levelOfCollapse);
-			}
-		}
-		else if (glfwGetKey(window, GLFW_KEY_P) == GLFW_PRESS)
-		{
-			usePolygon = 1;
-		}
-		else if(glfwGetKey(window, GLFW_KEY_M)==GLFW_PRESS)
-		{
-			usePolygon = 0;
-		}
 		else if (glfwGetKey(window, GLFW_KEY_H) == GLFW_PRESS)
 		{
 			printUsage();
 		}
 
-		if (usePolygon == 1)
-		{
-			glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-		}
-		else
-		{
-			glPolygonMode(GL_FRONT_AND_BACK,GL_FILL);
-		}
 		modelView = glm::lookAt(eye, center, up);
 		modelView = glm::translate(modelView, vec3(tx, ty, tz));
 		modelView = glm::scale(modelView, vec3(sc, sc, sc));
 		myScene.render(projection, modelView);
-
 		glfwSwapBuffers(window);
 	} while (glfwGetKey(window, GLFW_KEY_ESCAPE) != GLFW_PRESS && !glfwWindowShouldClose(window));
 	glfwTerminate();
