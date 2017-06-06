@@ -1,7 +1,4 @@
 ﻿  Scene.cpp
-c:\users\chunc\desktop\coursework\cse\cse163\assignment3\cse163hw2\cse163project2\scene.cpp(40): warning C4018: '<': signed/unsigned mismatch
-  Generating Code...
-  Skipping... (no relevant changes detected)
-  main.cpp
-  CSE163Project2.vcxproj -> C:\Users\chunc\Desktop\Coursework\CSE\CSE163\Assignment3\CSE163HW2\Debug\CSE163Project2.exe
-  CSE163Project2.vcxproj -> C:\Users\chunc\Desktop\Coursework\CSE\CSE163\Assignment3\CSE163HW2\Debug\CSE163Project2.pdb (Partial PDB)
+c:\users\zigan\desktop\github\cse163hw2\cse163project2\scene.cpp(40): warning C4018: '<': signed/unsigned mismatch
+  CSE163Project2.vcxproj -> C:\Users\zigan\Desktop\GitHub\CSE163HW2\Debug\CSE163Project2.exe
+  CSE163Project2.vcxproj -> C:\Users\zigan\Desktop\GitHub\CSE163HW2\Debug\CSE163Project2.pdb (Partial PDB)

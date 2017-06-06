@@ -46,11 +46,12 @@ void Mesh::readFile(const char* filename)
 	in.open(filename);
 	vector<string> tokens;
 	string token;
+	int faceCount = 0;
 	if (in.is_open())
 	{
 		int lineCount = 0;
 		int vertexCount = 0;
-		int faceCount = 0;
+
 
 		while (getline(in, str))
 		{
@@ -71,7 +72,7 @@ void Mesh::readFile(const char* filename)
 				{
 			
 					vertexCount = stoi(tokens[0]);
-					faceCount = stoi(tokens[1]);
+					//faceCount = stoi(tokens[1]);
 					this->numVertices = vertexCount;
 					lineCount++;
 					
@@ -84,8 +85,10 @@ void Mesh::readFile(const char* filename)
 					this->vtPos.push_back(vertPos);
 					lineCount++;
 				}
+				//read in all the faces
 				else
 				{
+					faceCount++;
 					int vt1 = stoi(tokens[1]);
 					int vt2 = stoi(tokens[2]);
 					int vt3 = stoi(tokens[3]);
@@ -104,6 +107,7 @@ void Mesh::readFile(const char* filename)
 		}
 	}
 	
+	
 	for (int i = 0; i < this->vertices.size(); i++)
 	{
 		vec3 vertexNormal = vec3(0.0f);
@@ -115,6 +119,8 @@ void Mesh::readFile(const char* filename)
 		vertices[i]->Normal = vertexNormal;
 		this->vtNorms.push_back(vertexNormal);
 	}
+
+	cout << faceCount << endl;
 }
 
 
@@ -122,26 +128,26 @@ void Mesh::setupMesh()
 {
 	glGenVertexArrays(1, &this->VAO);
 	glGenBuffers(1, &this->VBO);
+	glGenBuffers(1, &this->NBO);
 	glGenBuffers(1, &this->EBO);
 
 	glBindVertexArray(this->VAO);
-	glBindBuffer(GL_ARRAY_BUFFER, this->VBO);
 
+	glBindBuffer(GL_ARRAY_BUFFER, this->VBO);
 	glBufferData(GL_ARRAY_BUFFER, sizeof(vec3)*this->numVertices,
 		&this->vtPos[0], GL_STATIC_DRAW);
-
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, this->NBO);
-	glBufferData(GL_ELEMENT_ARRAY_BUFFER, this->numVertices * sizeof(vec3),
-		&this->vtNorms[0], GL_STATIC_DRAW);
-
 	// Vertex Positions to layout location 0
 	glEnableVertexAttribArray(0);
 	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(vec3),
 		(GLvoid*)0);
+
+	glBindBuffer(GL_ARRAY_BUFFER, this->NBO);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(vec3)*this->numVertices,
+		&this->vtNorms[0], GL_STATIC_DRAW);
 	// Vertex Normals to layout location 1
 	glEnableVertexAttribArray(1);
 	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(vec3),
-		(GLvoid*)offsetof(Vertex, Normal));
+		(GLvoid*)0);
 
 	//indices array
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, this->EBO);
@@ -157,38 +163,38 @@ void Mesh::setupMesh()
 
 void Mesh::Draw(Shader shader,mat4 modelview,mat4 projection) {
 
-	////set up material properties
-	//glUniform4f(glGetUniformLocation(shader.Program, "mtl.ambient"), 0.4f, 0.1f, 0.3f,1.0f);
-	//glUniform4f(glGetUniformLocation(shader.Program, "mtl.diffuse"), 0.5f, 0.2f, 1.0f,1.0f);
-	//glUniform4f(glGetUniformLocation(shader.Program, "mtl.specular"), 0.5f, 0.5f, 0.5f,1.0f);
-	//glUniform1f(glGetUniformLocation(shader.Program, "mtl.shininess"), 50.0f);
-	// 
-	//
+	//set up material properties
+	glUniform4f(glGetUniformLocation(shader.Program, "mtl.ambient"), 0.4f, 0.1f, 0.3f,1.0f);
+	glUniform4f(glGetUniformLocation(shader.Program, "mtl.diffuse"), 0.5f, 0.2f, 1.0f,1.0f);
+	glUniform4f(glGetUniformLocation(shader.Program, "mtl.specular"), 0.5f, 0.5f, 0.5f,1.0f);
+	glUniform1f(glGetUniformLocation(shader.Program, "mtl.shininess"), 100.0f);
+	 
+	
 
-	////set up lights
-	//GLfloat positions[8];
-	//GLfloat colors[8];
-	//glm::vec4 light1Pos = vec4(0.6f, 0.0f, 0.1f, 0.0f);
+	//set up lights
+	GLfloat positions[8];
+	GLfloat colors[8];
+	glm::vec4 light1Pos = vec4(0.6f, 0.0f, 0.1f, 0.0f);
 	//light1Pos = modelview*light1Pos;
-	//glm::vec4 light1Col = vec4(1.0f, 0.5f, 0.0f, 1.0f);
-	//for (int i = 0; i < 4; i++)
-	//{
-	//	positions[i] = light1Pos[i];
-	//	colors[i] = light1Col[i];
-	//}
-	//
-	//vec4 light2Pos = vec4(0.0f, -0.6f, 0.1f, 1.0f);
+	glm::vec4 light1Col = vec4(1.0f, 0.5f, 0.0f, 1.0f);
+	for (int i = 0; i < 4; i++)
+	{
+		positions[i] = light1Pos[i];
+		colors[i] = light1Col[i];
+	}
+	
+	vec4 light2Pos = vec4(0.0f, -0.6f, 0.1f, 1.0f);
 	//light2Pos = modelview*light2Pos;
-	//vec4 light2Col = vec4(0.5f, 0.5, 1.0f, 1.0f);
-	//for (int i = 4; i < 8; i++)
-	//{
-	//	positions[i] = light2Pos[i - 4];
-	//	colors[i] = light2Col[i - 4];
-	//}
+	vec4 light2Col = vec4(0.5f, 0.5, 1.0f, 1.0f);
+	for (int i = 4; i < 8; i++)
+	{
+		positions[i] = light2Pos[i - 4];
+		colors[i] = light2Col[i - 4];
+	}
 
-	//glUniform1d(glGetUniformLocation(shader.Program, "numLight"), 2);
-	//glUniform4fv(glGetUniformLocation(shader.Program, "lightPos"), 2,positions);
-	//glUniform4fv(glGetUniformLocation(shader.Program, "lightColor"), 2, colors);
+	glUniform1i(glGetUniformLocation(shader.Program, "numLight"), 2);
+	glUniform4fv(glGetUniformLocation(shader.Program, "lightPos"), 2,positions);
+	glUniform4fv(glGetUniformLocation(shader.Program, "lightColor"), 2, colors);
 	
 	glBindVertexArray(this->VAO);
 	glDrawElements(GL_TRIANGLES, this->indices.size(), GL_UNSIGNED_INT, 0);

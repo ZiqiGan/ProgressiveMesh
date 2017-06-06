@@ -30,14 +30,14 @@ uniform vec4 lightColor[2];
 
         float nDotH = dot(normal, halfvec) ; 
         vec4 phong = myspecular * lightcolor * pow (max(nDotH, 0.0), myshininess) ; 
-
         vec4 retval = lambert + phong ; 
         return retval ;            
 } 
 
 void main()
 {
-  	vec4 finalColor = vec4(0.0f,0.0f,0.0f,1.0f);
+
+  	vec4 finalColor = vec4(0.0f,0.0f,0.0f,0.0f);
 	const vec3 eyepos = vec3(0,0,0);
 	vec4 _mypos = modelview * myvertex;
 	vec3 mypos = _mypos.xyz / _mypos.w ;
@@ -47,7 +47,7 @@ void main()
     mat4 normalInverseTranspose = transpose(normalInverse);
     vec3 _normal = (normalInverseTranspose*vec4(mynormal,0.0)).xyz ; 
     vec3 normal = normalize(_normal) ;
-
+	
 	vec4 light;
 	vec4 color;        
 	for(int i=0;i<numLight;i++)
