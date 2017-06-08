@@ -78,7 +78,7 @@
     </ClCompile>
     <Link>
       <AdditionalDependencies>opengl32.lib;glew32.lib;glfw3.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <AdditionalLibraryDirectories>C:\Users\chunc\Desktop\Programing\glfw-3.2.1.bin.WIN32\lib-vc2015;C:\Users\zigan\Desktop\glfw-3.2.1.bin.WIN32\lib-vc2015;C:\Users\Public\Desktop\glew-2.0.0\lib\Release\Win32;C:\Users\zigan\Desktop\glfw-3.2.1.bin.WIN32\glfw-3.2.1.bin.WIN32\lib-vc2015;C:\Users\chunc\Desktop\Programing\glew-2.0.0\lib\Release\Win32;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>C:\Users\zigan\Desktop\glfw-3.2.1.bin.WIN32\lib-vc2015;C:\Users\chunc\Desktop\Programing\glfw-3.2.1.bin.WIN32\lib-vc2015;C:\Users\Public\Desktop\glew-2.0.0\lib\Release\Win32;C:\Users\zigan\Desktop\glfw-3.2.1.bin.WIN32\glfw-3.2.1.bin.WIN32\lib-vc2015;C:\Users\chunc\Desktop\Programing\glew-2.0.0\lib\Release\Win32;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
@@ -121,11 +121,12 @@
     <None Include="shader.vs.glsl" />
     <None Include="shadow.frag.glsl" />
     <None Include="shadow.vs.glsl" />
+    <None Include="depth.vs.glsl" />
+    <None Include="depth.frag.glsl" />
     <None Include="skybox.frag.glsl" />
     <None Include="skybox.vs.glsl" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="globals.h" />
     <ClInclude Include="image.h" />
     <ClInclude Include="Mesh.h" />
     <ClInclude Include="Scene.h" />

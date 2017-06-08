@@ -376,3 +376,4 @@ struct aiScene
 #endif
 
 #endif // __AI_SCENE_H_INC__
+

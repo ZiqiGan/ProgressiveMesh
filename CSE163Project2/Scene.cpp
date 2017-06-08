@@ -1,5 +1,4 @@
 #include "Scene.h"
-#include "globals.h"
 #include <stdlib.h>
 #include <stdio.h>
 #include <iostream>
@@ -48,7 +47,7 @@ void Scene::setupScene()
 	//glBindVertexArray(0);
 }
 
-void Scene::render(const mat4 & projection, const mat4 & modelview)
+void Scene::render(const mat4 & projection, const mat4 & view)
 {
 	
 	//set up shadow shader
@@ -57,6 +56,7 @@ void Scene::render(const mat4 & projection, const mat4 & modelview)
 	glUniform1i(glGetUniformLocation(shadowShader.Program, "diffuseTexture"), 0);
 	glUniform1i(glGetUniformLocation(shadowShader.Program, "shadowMap"), 1);
 	
+
 	//render depth of scene to texture
 	mat4 lightProjection, lightView;
 	mat4 lightSpaceMatrix;
@@ -65,23 +65,38 @@ void Scene::render(const mat4 & projection, const mat4 & modelview)
 	glm::vec3 lightPos = vec3(0.6f, 0.0f, 0.1f);
 	lightView = glm::lookAt(lightPos, glm::vec3(0.0f), glm::vec3(0.0, 1.0, 0.0));
 	lightSpaceMatrix = lightProjection * lightView;
-	Shader mapShader("./shadow_map.vs.glsl", "./shadow_map.frag.glsl");
-	mapShader.Use();
-	glUniformMatrix4fv(glGetUniformLocation(mapShader.Program, "lightSpace"), 1, GL_FALSE, glm::value_ptr(lightSpaceMatrix));
+	Shader depthShader("./depth.vs.glsl", "./depth.frag.glsl");
+	depthShader.Use();
+	glUniformMatrix4fv(glGetUniformLocation(depthShader.Program, "lightSpace"), 1, GL_FALSE, glm::value_ptr(lightSpaceMatrix));
 	glViewport(0, 0, SHADOW_WIDTH, SHADOW_HEIGHT);
 	glBindFramebuffer(GL_FRAMEBUFFER, depthMapFBO);
 	glClear(GL_DEPTH_BUFFER_BIT);
+	renderScene(depthShader,view, projection);
+	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
-	//normal bling-phong shader
-	Shader shader("./shader.vs.glsl", "./shader.frag.glsl");
+	//reset viewport
+	glViewport(0, 0, SHADOW_WIDTH, SHADOW_HEIGHT);
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+	//render scene as normal using the shadow map
+	Shader shader("./shadow.vs.glsl", "./shadow.frag.glsl");
 	shader.Use();
-	glUniformMatrix4fv(glGetUniformLocation(shader.Program, "projection"), 1, GL_FALSE, glm::value_ptr(projection));
-	glUniformMatrix4fv(glGetUniformLocation(shader.Program, "modelview"), 1, GL_FALSE, glm::value_ptr(modelview));
-	for (int i = 0; i < objects.size(); i++)
-	{
-		objects[i].setupMesh();
-		objects[i].Draw(shader, modelview, projection);
-	}
+	renderScene(shader, view, projection);
+
+
+
+	
+
+
+
+	//normal bling-phong shading
+	//Shader shader("./shader.vs.glsl", "./shader.frag.glsl");
+	//shader.Use();
+	//glUniformMatrix4fv(glGetUniformLocation(shader.Program, "projection"), 1, GL_FALSE, glm::value_ptr(projection));
+	//glUniformMatrix4fv(glGetUniformLocation(shader.Program, "modelview"), 1, GL_FALSE, glm::value_ptr(modelview));
+	
+	
+
 	
 
 
@@ -106,7 +121,15 @@ void Scene::render(const mat4 & projection, const mat4 & modelview)
 	//glBindVertexArray(0);
 	//glDepthFunc(GL_LESS); // set depth function back to default
 
+}
 
+void Scene::renderScene(Shader & shader,const mat4 view, const mat4 projection)
+{
+	for (int i = 0; i < this->objects.size(); i++)
+	{
+		objects[i].setupMesh();
+		objects[i].Draw(shader, view, projection);
+	}
 }
 
 unsigned int Scene::loadCubemap(vector<std::string> faces)

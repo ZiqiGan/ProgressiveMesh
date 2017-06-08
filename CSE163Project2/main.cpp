@@ -50,8 +50,9 @@ int main(int argc, char* argv[])
 	float fovy = 45.0f;
 	float aspect = (float)width / (float)height, zNear = 0.1f, zFar = 99.0f;
 	mat4 projection = glm::perspective(glm::radians(fovy), aspect, zNear, zFar);
-	mat4 modelView = glm::lookAt(eye, center, up);
-	
+	//mat4 modelView = glm::lookAt(eye, center, up);
+	mat4 view = glm::lookAt(eye, center, up);
+
 	// OpenGL options
 	glEnable(GL_DEPTH_TEST);	
 	glfwSetInputMode(window, GLFW_STICKY_KEYS, GL_TRUE);
@@ -70,8 +71,8 @@ int main(int argc, char* argv[])
 	float ty = 0;
 	float tz = 0;
 	float sc = 0.2f;
-	modelView = glm::translate(modelView, glm::vec3(0.0f, -4.0f, -4.0f));
-	modelView = glm::translate(modelView, glm::vec3(sc, sc, sc));
+	view = glm::translate(view, glm::vec3(0.0f, -4.0f, -4.0f));
+	view = glm::translate(view, glm::vec3(sc, sc, sc));
 	do
 	{
 		glfwPollEvents();
@@ -91,9 +92,9 @@ int main(int argc, char* argv[])
 		}
 		else if (glfwGetKey(window, GLFW_KEY_UP) == GLFW_PRESS)
 		{
-			modelView = glm::translate(modelView, vec3(-tx, -ty, -tz));
+			view = glm::translate(view, vec3(-tx, -ty, -tz));
 			Transform::up(rotation, eye, up);
-			modelView = glm::translate(modelView, vec3(tx, ty, tz));
+			view = glm::translate(view, vec3(tx, ty, tz));
 		}
 		else if (glfwGetKey(window, GLFW_KEY_DOWN) == GLFW_PRESS)
 		{
@@ -137,10 +138,10 @@ int main(int argc, char* argv[])
 			printUsage();
 		}
 
-		modelView = glm::lookAt(eye, center, up);
-		modelView = glm::translate(modelView, vec3(tx, ty, tz));
-		modelView = glm::scale(modelView, vec3(sc, sc, sc));
-		myScene.render(projection, modelView);
+		view = glm::lookAt(eye, center, up);
+		view = glm::translate(view, vec3(tx, ty, tz));
+		view = glm::scale(view, vec3(sc, sc, sc));
+		myScene.render(projection, view);
 		glfwSwapBuffers(window);
 	} while (glfwGetKey(window, GLFW_KEY_ESCAPE) != GLFW_PRESS && !glfwWindowShouldClose(window));
 	glfwTerminate();

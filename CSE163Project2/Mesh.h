@@ -82,8 +82,8 @@ public:
 	Mesh();   
 	void readFile(const char* filename);
 	void setupMesh(); 
-	void Draw(Shader shader,mat4 modelview,mat4 projection);
-
+	void Draw(Shader& shader, mat4 view,mat4 projection);
+	glm::mat4 model;
 
 private:
 	GLuint VAO, VBO,NBO, EBO;

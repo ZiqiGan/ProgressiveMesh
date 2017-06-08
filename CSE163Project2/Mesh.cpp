@@ -157,16 +157,24 @@ void Mesh::setupMesh()
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 	glBindVertexArray(0);
 
-
 }
 
 
-void Mesh::Draw(Shader shader,mat4 modelview,mat4 projection) {
+void Mesh::Draw( Shader& shader,mat4 view,mat4 projection) {
+
+	
+	//configure shader
+	/*Shader shader("./shader.vs.glsl", "./shader.frag.glsl");
+	shader.Use();*/
+	glUniformMatrix4fv(glGetUniformLocation(shader.Program, "modelview"), 1, GL_FALSE, glm::value_ptr(this->model));
+	glUniformMatrix4fv(glGetUniformLocation(shader.Program, "modelview"), 1, GL_FALSE, glm::value_ptr(view));
+	glUniformMatrix4fv(glGetUniformLocation(shader.Program, "projection"), 1, GL_FALSE, glm::value_ptr(projection));
+	
 
 	//set up material properties
 	glUniform4f(glGetUniformLocation(shader.Program, "mtl.ambient"), 0.4f, 0.1f, 0.3f,1.0f);
-	glUniform4f(glGetUniformLocation(shader.Program, "mtl.diffuse"), 0.5f, 0.2f, 1.0f,1.0f);
-	glUniform4f(glGetUniformLocation(shader.Program, "mtl.specular"), 0.5f, 0.5f, 0.5f,1.0f);
+	glUniform4f(glGetUniformLocation(shader.Program, "mtl.diffuse"), 1.0f, 1.0f, 1.0f,1.0f);
+	glUniform4f(glGetUniformLocation(shader.Program, "mtl.specular"), 1.0f, 1.0f, 1.0f,1.0f);
 	glUniform1f(glGetUniformLocation(shader.Program, "mtl.shininess"), 100.0f);
 	 
 	

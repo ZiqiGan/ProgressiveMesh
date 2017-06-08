@@ -13,6 +13,7 @@ public:
 	Scene(const char* path);
 	void setupScene();
 	void render(const mat4 & projection, const mat4 & modelview);
+	void renderScene( Shader & shader,const mat4 view, const mat4 projection);
 	unsigned int loadCubemap(vector<std::string> faces);
 	vector<std::string> cubeFaces
 	{

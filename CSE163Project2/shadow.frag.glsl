@@ -1,20 +1,31 @@
 #version 330 core
-out vec4 FragColor;
+struct Material {
+    vec4 ambient;
+    vec4 diffuse;
+    vec4 specular;    
+    float shininess;
+}; 
 
-in VS_OUT {
-    vec3 FragPos;
-    vec3 Normal;
-    vec2 TexCoords;
-    vec4 FragPosLightSpace;
-} fs_in;
+struct Light {
+    vec4 position;
+	vec4 color;
+};
 
-uniform sampler2D diffuseTexture;
 uniform sampler2D shadowMap;
 
-uniform vec3 lightPos;
-uniform vec3 viewPos;
+in vec3 mynormal;
+in vec4 myvertex;
+  
+out vec4 fragColor;
 
-float ShadowCalculation(vec4 fragPosLightSpace)
+uniform mat4 modelview;
+uniform vec3 viewPos;
+uniform Material mtl;
+uniform int numLight;
+uniform vec4 lightPos[2];
+uniform vec4 lightColor[2];
+
+float calculateShadow(vec4 fragPosLightSpace)
 {
     // perform perspective divide
     vec3 projCoords = fragPosLightSpace.xyz / fragPosLightSpace.w;
@@ -28,29 +39,62 @@ float ShadowCalculation(vec4 fragPosLightSpace)
     float shadow = currentDepth > closestDepth  ? 1.0 : 0.0;
 
     return shadow;
+
 }
+ vec4 ComputeLight (const in vec3 direction, const in vec4 lightcolor, const in vec3 normal, const in vec3 halfvec, const in vec4 mydiffuse, const in vec4 myspecular, const in float myshininess) {
+
+        float nDotL = dot(normal, direction)  ;         
+        vec4 lambert = mydiffuse * lightcolor * max (nDotL, 0.0) ;  
+
+        float nDotH = dot(normal, halfvec) ; 
+        vec4 phong = myspecular * lightcolor * pow (max(nDotH, 0.0), myshininess) ; 
+        vec4 retval = lambert + phong ; 
+        return retval ;            
+} 
 
 void main()
-{           
-    vec3 color = texture(diffuseTexture, fs_in.TexCoords).rgb;
-    vec3 normal = normalize(fs_in.Normal);
-    vec3 lightColor = vec3(0.3);
-    // ambient
-    vec3 ambient = 0.3 * color;
-    // diffuse
-    vec3 lightDir = normalize(lightPos - fs_in.FragPos);
-    float diff = max(dot(lightDir, normal), 0.0);
-    vec3 diffuse = diff * lightColor;
-    // specular
-    vec3 viewDir = normalize(viewPos - fs_in.FragPos);
-    vec3 reflectDir = reflect(-lightDir, normal);
-    float spec = 0.0;
-    vec3 halfwayDir = normalize(lightDir + viewDir);  
-    spec = pow(max(dot(normal, halfwayDir), 0.0), 64.0);
-    vec3 specular = spec * lightColor;    
-    // calculate shadow
-    float shadow = ShadowCalculation(fs_in.FragPosLightSpace);                      
-    vec3 lighting = (ambient + (1.0 - shadow) * (diffuse + specular)) * color;    
-    
-    FragColor = vec4(lighting, 1.0);
-}
+{
+
+  	vec4 finalColor = vec4(0.0f,0.0f,0.0f,0.0f);
+	const vec3 eyepos = vec3(0,0,0);
+	vec4 _mypos = modelview * myvertex;
+	vec3 mypos = _mypos.xyz / _mypos.w ;
+	vec3 eyedirn = normalize(eyepos-mypos);
+
+	mat4 normalInverse = inverse(modelview);
+    mat4 normalInverseTranspose = transpose(normalInverse);
+    vec3 _normal = (normalInverseTranspose*vec4(mynormal,0.0)).xyz ; 
+    vec3 normal = normalize(_normal) ;
+	
+	vec4 light;
+	vec4 color;        
+	for(int i=0;i<numLight;i++)
+    {
+            light = lightPos[i];
+            vec4 col;
+            
+            //if the light is directional
+            if(light.w==0)
+            {
+                vec3 direction = normalize(light.xyz);
+                vec3 half0 = normalize (direction + eyedirn) ; 
+                col = ComputeLight(direction, lightColor[i], normal, half0, 
+                                                mtl.diffuse, mtl.specular, mtl.shininess);
+            }
+        
+            //else point light
+            else
+            {
+                vec3 position = light.xyz/light.w;
+                vec3 direction = normalize(position - mypos);
+                vec3 half0 = normalize(direction + eyedirn);
+                col = ComputeLight(direction,lightColor[i],normal,half0,
+                                                mtl.diffuse, mtl.specular,mtl.shininess);
+            } 
+            finalColor+=col;
+	}
+    finalColor = mtl.ambient+finalColor;
+    float shadow = calculateShadow(fragPosLightSpace);
+	vec4 lighting  = (mtl.ambient+(1.0 - shadow)* (diffuse+specular))*color;
+	fragColor = lighting;
+} 

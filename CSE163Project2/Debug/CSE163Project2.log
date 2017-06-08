@@ -1,2 +1,14 @@
-﻿  CSE163Project2.vcxproj -> C:\Users\chunc\Desktop\Coursework\CSE\CSE163\Assignment3\CSE163HW2\Debug\CSE163Project2.exe
-  CSE163Project2.vcxproj -> C:\Users\chunc\Desktop\Coursework\CSE\CSE163\Assignment3\CSE163HW2\Debug\CSE163Project2.pdb (Partial PDB)
+﻿  main.cpp
+c:\users\zigan\desktop\github\cse163hw2\cse163project2\transform.h(14): warning C4305: 'initializing': truncation from 'double' to 'float'
+c:\program files (x86)\windows kits\8.1\include\shared\minwindef.h(130): warning C4005: 'APIENTRY': macro redefinition
+  c:\users\zigan\desktop\github\cse163hw2\packages\glfw.3.2.1\build\native\include\glfw\glfw3.h(98): note: see previous definition of 'APIENTRY'
+c:\users\zigan\desktop\github\cse163hw2\cse163project2\main.cpp(79): warning C4305: 'argument': truncation from 'double' to 'GLclampf'
+  Shader.cpp
+  Scene.cpp
+c:\users\zigan\desktop\github\cse163hw2\cse163project2\scene.cpp(128): warning C4018: '<': signed/unsigned mismatch
+  Mesh.cpp
+c:\users\zigan\desktop\github\cse163hw2\cse163project2\mesh.cpp(111): warning C4018: '<': signed/unsigned mismatch
+c:\users\zigan\desktop\github\cse163hw2\cse163project2\mesh.cpp(114): warning C4018: '<': signed/unsigned mismatch
+  Generating Code...
+  CSE163Project2.vcxproj -> C:\Users\zigan\Desktop\GitHub\CSE163HW2\Debug\CSE163Project2.exe
+  CSE163Project2.vcxproj -> C:\Users\zigan\Desktop\GitHub\CSE163HW2\Debug\CSE163Project2.pdb (Partial PDB)

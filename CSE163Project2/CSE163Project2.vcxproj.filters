@@ -37,6 +37,12 @@
     <None Include="shadow.frag.glsl">
       <Filter>shaders</Filter>
     </None>
+    <None Include="depth.vs.glsl">
+      <Filter>shaders</Filter>
+    </None>
+    <None Include="depth.frag.glsl">
+      <Filter>shaders</Filter>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Mesh.h">
@@ -46,9 +52,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Shader.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="globals.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Transform.h">
