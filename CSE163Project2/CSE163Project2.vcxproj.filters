@@ -31,6 +31,12 @@
     <None Include="em.frag.glsl">
       <Filter>shaders</Filter>
     </None>
+    <None Include="shadow.vs.glsl">
+      <Filter>shaders</Filter>
+    </None>
+    <None Include="shadow.frag.glsl">
+      <Filter>shaders</Filter>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Mesh.h">

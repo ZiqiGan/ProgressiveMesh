@@ -37,6 +37,10 @@ public:
 
 	};
 	GLuint skyboxVAO, skyboxVBO, skyboxEBO;
+	GLuint depthMapFBO, depthMap;
+	//set up depth map
+	const int SHADOW_WIDTH = 640;
+	const int SHADOW_HEIGHT = 480;
 	vector<GLfloat>  skyboxVertices= {
 		// positions          
 		-100.0f,  100.0f, -100.0f,

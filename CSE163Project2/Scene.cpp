@@ -16,6 +16,24 @@ void Scene::setupScene()
 	object.readFile(this->fileName);
 	this->objects.push_back(object);
 
+	//genereate framebuffer
+	glGenFramebuffers(1, &this->depthMapFBO);
+	//create depth texture
+	glGenTextures(1, &this->depthMap);
+	glBindTexture(GL_TEXTURE_2D, this->depthMap);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT, SHADOW_WIDTH, SHADOW_HEIGHT, 0, GL_DEPTH_COMPONENT, GL_FLOAT, NULL);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+	// attach depth texture as FBO's depth buffer
+	glBindFramebuffer(GL_FRAMEBUFFER, depthMapFBO);
+	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, this->depthMap, 0);
+	glDrawBuffer(GL_NONE);
+	glReadBuffer(GL_NONE);
+	glBindFramebuffer(GL_FRAMEBUFFER, 0);
+
+
 	////setup skybox
 	//glGenVertexArrays(1, &skyboxVAO);
 	//glGenBuffers(1, &skyboxVBO);
@@ -33,35 +51,60 @@ void Scene::setupScene()
 void Scene::render(const mat4 & projection, const mat4 & modelview)
 {
 	
-		Shader shader("./shader.vs.glsl", "./shader.frag.glsl");
-		shader.Use();
-		glUniformMatrix4fv(glGetUniformLocation(shader.Program, "projection"), 1, GL_FALSE, glm::value_ptr(projection));
-		glUniformMatrix4fv(glGetUniformLocation(shader.Program, "modelview"), 1, GL_FALSE, glm::value_ptr(modelview));
-		for (int i = 0; i < objects.size(); i++)
-		{
-			objects[i].setupMesh();
-			objects[i].Draw(shader, modelview, projection);
-		}
+	//set up shadow shader
+	Shader shadowShader("./shadow.vs.glsl", "./shadow.frag.glsl");
+	shadowShader.Use();
+	glUniform1i(glGetUniformLocation(shadowShader.Program, "diffuseTexture"), 0);
+	glUniform1i(glGetUniformLocation(shadowShader.Program, "shadowMap"), 1);
+	
+	//render depth of scene to texture
+	mat4 lightProjection, lightView;
+	mat4 lightSpaceMatrix;
+	float zNear = 1.0f, zFar = 7.5f;
+	lightProjection = glm::ortho(-10.0f, 10.0f, -10.0f, 10.0f, zNear, zFar);
+	glm::vec3 lightPos = vec3(0.6f, 0.0f, 0.1f);
+	lightView = glm::lookAt(lightPos, glm::vec3(0.0f), glm::vec3(0.0, 1.0, 0.0));
+	lightSpaceMatrix = lightProjection * lightView;
+	Shader mapShader("./shadow_map.vs.glsl", "./shadow_map.frag.glsl");
+	mapShader.Use();
+	glUniformMatrix4fv(glGetUniformLocation(mapShader.Program, "lightSpace"), 1, GL_FALSE, glm::value_ptr(lightSpaceMatrix));
+	glViewport(0, 0, SHADOW_WIDTH, SHADOW_HEIGHT);
+	glBindFramebuffer(GL_FRAMEBUFFER, depthMapFBO);
+	glClear(GL_DEPTH_BUFFER_BIT);
 
-		//render the skybox
-		//vec3 eye = glm::vec3(0.0f, 0.0f, 3.0f);
-		//vec3 center = vec3(0.0f, 0.0f, -1.0f);
-		//vec3 up = vec3(0.0f, 1.0f, 0.0f);
-		//glUniform3fv(glGetUniformLocation(shader.Program, "cameraPos"), 1, glm::value_ptr(eye));
-		//mat4 modelView = glm::lookAt(eye, center, up);
-		//
-		//unsigned int cubemapTexture = loadCubemap(this -> cubeFaces);
-		//Shader skyboxShader("./skybox.vs.glsl","./skybox.frag.glsl" );
-		//glDepthFunc(GL_LEQUAL);
-		//skyboxShader.Use();
-		//glUniformMatrix4fv(glGetUniformLocation(skyboxShader.Program, "projection"), 1, GL_FALSE, glm::value_ptr(projection));
-		//glUniformMatrix4fv(glGetUniformLocation(skyboxShader.Program, "modelview"), 1, GL_FALSE, glm::value_ptr(modelView));
-		//glBindVertexArray(skyboxVAO);
-		//glActiveTexture(GL_TEXTURE0);
-		//glBindTexture(GL_TEXTURE_CUBE_MAP, cubemapTexture);
-		//glDrawArrays(GL_TRIANGLES, 0, 36);
-		//glBindVertexArray(0);
-		//glDepthFunc(GL_LESS); // set depth function back to default
+	//normal bling-phong shader
+	Shader shader("./shader.vs.glsl", "./shader.frag.glsl");
+	shader.Use();
+	glUniformMatrix4fv(glGetUniformLocation(shader.Program, "projection"), 1, GL_FALSE, glm::value_ptr(projection));
+	glUniformMatrix4fv(glGetUniformLocation(shader.Program, "modelview"), 1, GL_FALSE, glm::value_ptr(modelview));
+	for (int i = 0; i < objects.size(); i++)
+	{
+		objects[i].setupMesh();
+		objects[i].Draw(shader, modelview, projection);
+	}
+	
+
+
+
+	//render the skybox
+	//vec3 eye = glm::vec3(0.0f, 0.0f, 3.0f);
+	//vec3 center = vec3(0.0f, 0.0f, -1.0f);
+	//vec3 up = vec3(0.0f, 1.0f, 0.0f);
+	//glUniform3fv(glGetUniformLocation(shader.Program, "cameraPos"), 1, glm::value_ptr(eye));
+	//mat4 modelView = glm::lookAt(eye, center, up);
+	//
+	//unsigned int cubemapTexture = loadCubemap(this -> cubeFaces);
+	//Shader skyboxShader("./skybox.vs.glsl","./skybox.frag.glsl" );
+	//glDepthFunc(GL_LEQUAL);
+	//skyboxShader.Use();
+	//glUniformMatrix4fv(glGetUniformLocation(skyboxShader.Program, "projection"), 1, GL_FALSE, glm::value_ptr(projection));
+	//glUniformMatrix4fv(glGetUniformLocation(skyboxShader.Program, "modelview"), 1, GL_FALSE, glm::value_ptr(modelView));
+	//glBindVertexArray(skyboxVAO);
+	//glActiveTexture(GL_TEXTURE0);
+	//glBindTexture(GL_TEXTURE_CUBE_MAP, cubemapTexture);
+	//glDrawArrays(GL_TRIANGLES, 0, 36);
+	//glBindVertexArray(0);
+	//glDepthFunc(GL_LESS); // set depth function back to default
 
 
 }
