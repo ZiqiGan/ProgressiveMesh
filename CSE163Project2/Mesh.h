@@ -84,7 +84,7 @@ public:
 	void setupMesh();
 	void drawDepth(Shader & shader);
 	void Draw(Shader& shader, mat4 view,mat4 projection);
-	glm::mat4 model;
+	glm::mat4 model = mat4(1.0f);
 
 private:
 	GLuint VAO, VBO,NBO, EBO;

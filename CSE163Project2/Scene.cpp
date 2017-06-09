@@ -20,40 +20,9 @@ void Scene::setupScene()
 	object2.model = glm::translate(object2.model, vec3(-8.0f, 5.0f, 0));
 	this->objects.push_back(object2);
 
+	setupPlane();
+	setupFrameBuffer();
 
-	//genereate framebuffer
-	glGenFramebuffers(1, &this->depthMapFBO);
-	//create depth texture
-	glGenTextures(1, &this->depthMap);
-	glBindTexture(GL_TEXTURE_2D, this->depthMap);
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT, SHADOW_WIDTH, SHADOW_HEIGHT, 0, GL_DEPTH_COMPONENT, GL_FLOAT, NULL);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-	// attach depth texture as FBO's depth buffer
-	glBindFramebuffer(GL_FRAMEBUFFER, depthMapFBO);
-	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, this->depthMap, 0);
-	glDrawBuffer(GL_NONE);
-	glReadBuffer(GL_NONE);
-	glBindFramebuffer(GL_FRAMEBUFFER, 0);
-
-
-	//set up plane to show shadows
-	glGenVertexArrays(1, &planeVAO);
-	glGenBuffers(1, &planeVBO);
-	glBindVertexArray(planeVAO);
-	glBindBuffer(GL_ARRAY_BUFFER, planeVBO);
-	glBufferData(GL_ARRAY_BUFFER, sizeof(GLfloat)*planeVertices.size(), &planeVertices[0], GL_STATIC_DRAW);
-	glEnableVertexAttribArray(0);
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(GLfloat), (GLvoid*)0);
-	glEnableVertexAttribArray(1);
-	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(GLfloat), (GLvoid*)(3 * sizeof(GLfloat)));
-	glEnableVertexAttribArray(2);
-	glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(GLfloat), (GLvoid*)(6 * sizeof(GLfloat)));
-	glBindVertexArray(0);
-
-	this->woodTexture = loadTexture("./models/wood.png");
 	////set up quad for debugging
 	//glGenVertexArrays(1, &quadVAO);
 	//glGenBuffers(1, &quadVBO);
@@ -82,6 +51,47 @@ void Scene::setupScene()
 	//glBindVertexArray(0);
 }
 
+void Scene::setupFrameBuffer()
+{
+	//genereate framebuffer
+	glGenFramebuffers(1, &this->depthMapFBO);
+	glBindFramebuffer(GL_FRAMEBUFFER, depthMapFBO);
+	//create depth texture
+	glGenTextures(1, &this->depthMap);
+	glBindTexture(GL_TEXTURE_2D, this->depthMap);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT, 1024, 1024, 0, GL_DEPTH_COMPONENT, GL_FLOAT, NULL);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+
+	// attach depth texture as FBO's depth buffer
+	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, this->depthMap, 0);
+	glDrawBuffer(GL_NONE);
+	//glReadBuffer(GL_NONE);
+	//glBindFramebuffer(GL_FRAMEBUFFER, 0);
+
+
+}
+void Scene::setupPlane()
+{
+	//set up plane to show shadows
+	glGenVertexArrays(1, &planeVAO);
+	glGenBuffers(1, &planeVBO);
+	glBindVertexArray(planeVAO);
+	glBindBuffer(GL_ARRAY_BUFFER, planeVBO);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(GLfloat)*planeVertices.size(), &planeVertices[0], GL_STATIC_DRAW);
+	glEnableVertexAttribArray(0);
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(GLfloat), (GLvoid*)0);
+	glEnableVertexAttribArray(1);
+	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(GLfloat), (GLvoid*)(3 * sizeof(GLfloat)));
+	glEnableVertexAttribArray(2);
+	glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(GLfloat), (GLvoid*)(6 * sizeof(GLfloat)));
+	glBindVertexArray(0);
+
+	this->woodTexture = loadTexture("./models/wood.png");
+}
+
 void Scene::render(const mat4 & projection, const mat4 & view)
 {
 
@@ -90,20 +100,24 @@ void Scene::render(const mat4 & projection, const mat4 & view)
 	mat4 lightSpaceMatrix;
 	float zNear = 1.0f, zFar = 7.5f;
 	lightProjection = glm::ortho(-10.0f, 10.0f, -10.0f, 10.0f, zNear, zFar);
-	//glm::vec3 lightPos = vec3(0.6f, 0.0f, 0.1f);
-	glm::vec3 lightPos = vec3(0.0f, 100.0f, 0.0f);
+	glm::vec3 lightPos = vec3(-2.0f, 4.0f, -1.0f);
+	//glm::vec3 lightPos = vec3(6.0f, -0.1f, 1.0f);
 	lightView = glm::lookAt(lightPos, glm::vec3(0.0f), glm::vec3(0.0, 1.0, 0.0));
+	glm::mat4 lightModel = mat4(1.0f);
 	lightSpaceMatrix = lightProjection * lightView;
 
 	//configure depth shader
 	Shader depthShader("./depth.vs.glsl", "./depth.frag.glsl");
 	depthShader.Use();
 	glUniformMatrix4fv(glGetUniformLocation(depthShader.Program, "lightSpaceMatrix"), 1, GL_FALSE, glm::value_ptr(lightSpaceMatrix));
-	glViewport(0, 0, SHADOW_WIDTH, SHADOW_HEIGHT);
+	glUniformMatrix4fv(glGetUniformLocation(depthShader.Program, "model"), 1, GL_FALSE, glm::value_ptr(lightModel));
+	
+	glViewport(0, 0, 1024, 1024);
 	glBindFramebuffer(GL_FRAMEBUFFER, depthMapFBO);
 	glClear(GL_DEPTH_BUFFER_BIT);
 	glActiveTexture(GL_TEXTURE0);
 	glBindTexture(GL_TEXTURE_2D, woodTexture);
+	drawPlane(depthShader, view, projection);
 	for (int i = 0; i < this->objects.size(); i++)
 	{
 		objects[i].setupMesh();
@@ -114,6 +128,7 @@ void Scene::render(const mat4 & projection, const mat4 & view)
 
 	//render scene as normal using the shadow map
 	//reset viewport
+
 	glViewport(0, 0, SHADOW_WIDTH, SHADOW_HEIGHT);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
@@ -122,9 +137,10 @@ void Scene::render(const mat4 & projection, const mat4 & view)
 	shadowShader.Use();
 	glUniform1i(glGetUniformLocation(shadowShader.Program, "wood"), 0);
 	glUniform1i(glGetUniformLocation(shadowShader.Program, "shadowMap"), 1);
-	glUniform4fv(glGetUniformLocation(shadowShader.Program, "lighSpaceMatrix"), GL_FALSE, glm::value_ptr(lightSpaceMatrix));
-	glActiveTexture(GL_TEXTURE0);
-	glBindTexture(GL_TEXTURE_2D, woodTexture);
+	glUniform4fv(glGetUniformLocation(shadowShader.Program, "lightSpaceMatrix"), GL_FALSE, glm::value_ptr(lightSpaceMatrix));
+
+	//glActiveTexture(GL_TEXTURE0);
+	//glBindTexture(GL_TEXTURE_2D, woodTexture);
 	glActiveTexture(GL_TEXTURE1);
 	glBindTexture(GL_TEXTURE_2D, depthMap);
 	this->renderScene(shadowShader, view, projection);
@@ -151,7 +167,12 @@ void Scene::render(const mat4 & projection, const mat4 & view)
 
 }
 
-
+void Scene::drawPlane(Shader & shader, const mat4 view, const mat4 projection)
+{
+	glBindVertexArray(this->planeVAO);
+	glDrawArrays(GL_TRIANGLES, 0, 6);
+	glBindVertexArray(0);
+}
 void Scene::renderScene(Shader & shader,const mat4 view, const mat4 projection)
 {
 	//draw plane
@@ -174,15 +195,14 @@ void Scene::renderScene(Shader & shader,const mat4 view, const mat4 projection)
 	//set up lights
 	GLfloat positions[8];
 	GLfloat colors[8];
-	glm::vec4 light1Pos = vec4(0.0f, 100.0f, 0.0f, 1.0f);
+	glm::vec4 lightPos = vec4(-2.0f, 4.0f, -1.0f,0.0f);
 	//light1Pos = view*light1Pos;
 	glm::vec4 light1Col = vec4(0.5f, 0.5f, 1.0f, 1.0f);
 	for (int i = 0; i < 4; i++)
 	{
-		positions[i] = light1Pos[i];
+		positions[i] = lightPos[i];
 		colors[i] = light1Col[i];
 	}
-
 	glUniform1i(glGetUniformLocation(shader.Program, "numLight"), 1);
 	glUniform4fv(glGetUniformLocation(shader.Program, "lightPos"), 1, positions);
 	glUniform4fv(glGetUniformLocation(shader.Program, "lightColor"), 1, colors);

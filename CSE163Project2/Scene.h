@@ -12,7 +12,10 @@ public:
 	const char* fileName;
 	Scene(const char* path);
 	void setupScene();
+	void setupFrameBuffer();
+	void setupPlane();
 	void render(const mat4 & projection, const mat4 & modelview);
+	void drawPlane(Shader & shader, const mat4 view, const mat4 projection);
 	void renderScene( Shader & shader,const mat4 view, const mat4 projection);
 	unsigned int loadCubemap(vector<std::string> faces);
 	vector<std::string> cubeFaces

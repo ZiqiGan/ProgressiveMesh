@@ -63,19 +63,22 @@ float calculateShadow(vec4 fragPosLightSpace)
 
 void main()
 {
-	vec3 texColor = texture(wood,TexCoords).rgb;
+	 vec3 projCoords = fragPosLightSpace.xyz / fragPosLightSpace.w;
+    // transform to [0,1] range
+
+	/*vec3 texColor = texture(wood,TexCoords).rgb;
   	vec4 finalColor = vec4(0.0f,0.0f,0.0f,0.0f);
 	const vec3 eyepos = vec3(0,0,0);
 	vec4 _mypos = modelview * myvertex;
 	vec3 mypos = _mypos.xyz / _mypos.w ;
 	vec3 eyedirn = normalize(eyepos-mypos);
-
+	fragColor = myvertex;
 	mat4 normalInverse = inverse(modelview);
     mat4 normalInverseTranspose = transpose(normalInverse);
     vec3 _normal = (normalInverseTranspose*vec4(mynormal,0.0)).xyz ; 
     vec3 normal = normalize(_normal) ;
 	
-	vec4 blinnphong;
+	vec4 blinnphong =vec4(0.0f,0.0f,0.0f,0.0f);
 	vec4 light;       
 	for(int i=0;i<numLight;i++)
     {
@@ -103,8 +106,10 @@ void main()
 			blinnphong +=col;
     
 	}
-	 // finalColor = mtl.ambient+finalColor;
+	//finalColor = mtl.ambient+blinnphong;
     float shadow = calculateShadow(fragPosLightSpace);
-	vec4 lighting  = (mtl.ambient+(1.0 - shadow))*(blinnphong)*vec4(texColor,1.0f);
-	fragColor = lighting;
+	
+	//vec4 lighting  = (mtl.ambient+(1.0 - shadow))*(blinnphong)*vec4(texColor,1.0f);
+	//fragColor = lighting;
+	fragColor = ret;*/
 } 
