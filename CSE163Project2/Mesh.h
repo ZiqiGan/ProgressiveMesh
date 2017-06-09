@@ -81,7 +81,8 @@ public:
 	Material mtl;
 	Mesh();   
 	void readFile(const char* filename);
-	void setupMesh(); 
+	void setupMesh();
+	void drawDepth(Shader & shader);
 	void Draw(Shader& shader, mat4 view,mat4 projection);
 	glm::mat4 model;
 

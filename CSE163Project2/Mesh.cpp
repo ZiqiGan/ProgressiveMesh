@@ -159,15 +159,23 @@ void Mesh::setupMesh()
 
 }
 
+//draw the depth map into the framebuffer
+void Mesh::drawDepth(Shader& shader)
+{
+	glUniformMatrix4fv(glGetUniformLocation(shader.Program, "model"), 1, GL_FALSE, glm::value_ptr(this->model));
+	glBindVertexArray(this->VAO);
+	glDrawElements(GL_TRIANGLES, this->indices.size(), GL_UNSIGNED_INT, 0);
+}
 
-void Mesh::Draw( Shader& shader,mat4 view,mat4 projection) {
+
+void Mesh::Draw(Shader& shader,mat4 view,mat4 projection) {
 
 	
 	//configure shader
-	/*Shader shader("./shader.vs.glsl", "./shader.frag.glsl");
-	shader.Use();*/
-	glUniformMatrix4fv(glGetUniformLocation(shader.Program, "modelview"), 1, GL_FALSE, glm::value_ptr(this->model));
-	glUniformMatrix4fv(glGetUniformLocation(shader.Program, "modelview"), 1, GL_FALSE, glm::value_ptr(view));
+	glm::mat4 modelview = view*this->model;
+	glUniformMatrix4fv(glGetUniformLocation(shader.Program, "model"), 1, GL_FALSE, glm::value_ptr(this->model));
+	glUniformMatrix4fv(glGetUniformLocation(shader.Program, "view"), 1, GL_FALSE, glm::value_ptr(view));
+	glUniformMatrix4fv(glGetUniformLocation(shader.Program, "modelview"), 1, GL_FALSE, glm::value_ptr(modelview));
 	glUniformMatrix4fv(glGetUniformLocation(shader.Program, "projection"), 1, GL_FALSE, glm::value_ptr(projection));
 	
 
@@ -182,30 +190,32 @@ void Mesh::Draw( Shader& shader,mat4 view,mat4 projection) {
 	//set up lights
 	GLfloat positions[8];
 	GLfloat colors[8];
-	glm::vec4 light1Pos = vec4(0.6f, 0.0f, 0.1f, 0.0f);
-	//light1Pos = modelview*light1Pos;
-	glm::vec4 light1Col = vec4(1.0f, 0.5f, 0.0f, 1.0f);
+	//glm::vec4 light1Pos = vec4(0.6f, 0.0f, 0.1f, 0.0f);
+	glm::vec4 light1Pos = vec4(0.0f, 100.0f, 0.0f, 1.0f);
+	//light1Pos = view*light1Pos;
+	glm::vec4 light1Col = vec4(0.5f, 0.5f, 1.0f, 1.0f);
 	for (int i = 0; i < 4; i++)
 	{
 		positions[i] = light1Pos[i];
 		colors[i] = light1Col[i];
 	}
-	
-	vec4 light2Pos = vec4(0.0f, -0.6f, 0.1f, 1.0f);
-	//light2Pos = modelview*light2Pos;
-	vec4 light2Col = vec4(0.5f, 0.5, 1.0f, 1.0f);
-	for (int i = 4; i < 8; i++)
-	{
-		positions[i] = light2Pos[i - 4];
-		colors[i] = light2Col[i - 4];
-	}
+	//
+	//vec4 light2Pos = vec4(0.0f, -0.6f, 0.1f, 1.0f);
+	////light2Pos = modelview*light2Pos;
+	//vec4 light2Col = vec4(0.5f, 0.5, 1.0f, 1.0f);
+	//for (int i = 4; i < 8; i++)
+	//{
+	//	positions[i] = light2Pos[i - 4];
+	//	colors[i] = light2Col[i - 4];
+	//}
 
-	glUniform1i(glGetUniformLocation(shader.Program, "numLight"), 2);
-	glUniform4fv(glGetUniformLocation(shader.Program, "lightPos"), 2,positions);
-	glUniform4fv(glGetUniformLocation(shader.Program, "lightColor"), 2, colors);
+	glUniform1i(glGetUniformLocation(shader.Program, "numLight"), 1);
+	glUniform4fv(glGetUniformLocation(shader.Program, "lightPos"), 1,positions);
+	glUniform4fv(glGetUniformLocation(shader.Program, "lightColor"), 1, colors);
 	
 	glBindVertexArray(this->VAO);
 	glDrawElements(GL_TRIANGLES, this->indices.size(), GL_UNSIGNED_INT, 0);
+	glBindVertexArray(0);
 }
 
 

@@ -11,11 +11,15 @@ struct Light {
 	vec4 color;
 };
 
+uniform sampler2D wood;
 uniform sampler2D shadowMap;
 
 in vec3 mynormal;
 in vec4 myvertex;
-  
+in vec4 fragPosLightSpace;
+in vec2 TexCoords;
+in vec3 fragPos;
+
 out vec4 fragColor;
 
 uniform mat4 modelview;
@@ -28,6 +32,7 @@ uniform vec4 lightColor[2];
 float calculateShadow(vec4 fragPosLightSpace)
 {
     // perform perspective divide
+
     vec3 projCoords = fragPosLightSpace.xyz / fragPosLightSpace.w;
     // transform to [0,1] range
     projCoords = projCoords * 0.5 + 0.5;
@@ -36,7 +41,11 @@ float calculateShadow(vec4 fragPosLightSpace)
     // get depth of current fragment from light's perspective
     float currentDepth = projCoords.z;
     // check whether current frag pos is in shadow
-    float shadow = currentDepth > closestDepth  ? 1.0 : 0.0;
+	float shadow = 0.0f;
+	if(currentDepth > closestDepth)
+	{
+		shadow = 1.0f;
+	}
 
     return shadow;
 
@@ -54,7 +63,7 @@ float calculateShadow(vec4 fragPosLightSpace)
 
 void main()
 {
-
+	vec3 texColor = texture(wood,TexCoords).rgb;
   	vec4 finalColor = vec4(0.0f,0.0f,0.0f,0.0f);
 	const vec3 eyepos = vec3(0,0,0);
 	vec4 _mypos = modelview * myvertex;
@@ -66,13 +75,13 @@ void main()
     vec3 _normal = (normalInverseTranspose*vec4(mynormal,0.0)).xyz ; 
     vec3 normal = normalize(_normal) ;
 	
-	vec4 light;
-	vec4 color;        
+	vec4 blinnphong;
+	vec4 light;       
 	for(int i=0;i<numLight;i++)
     {
             light = lightPos[i];
             vec4 col;
-            
+       
             //if the light is directional
             if(light.w==0)
             {
@@ -91,10 +100,11 @@ void main()
                 col = ComputeLight(direction,lightColor[i],normal,half0,
                                                 mtl.diffuse, mtl.specular,mtl.shininess);
             } 
-            finalColor+=col;
+			blinnphong +=col;
+    
 	}
-    finalColor = mtl.ambient+finalColor;
+	 // finalColor = mtl.ambient+finalColor;
     float shadow = calculateShadow(fragPosLightSpace);
-	vec4 lighting  = (mtl.ambient+(1.0 - shadow)* (diffuse+specular))*color;
+	vec4 lighting  = (mtl.ambient+(1.0 - shadow))*(blinnphong)*vec4(texColor,1.0f);
 	fragColor = lighting;
 } 

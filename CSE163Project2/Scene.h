@@ -39,6 +39,14 @@ public:
 	};
 	GLuint skyboxVAO, skyboxVBO, skyboxEBO;
 	GLuint depthMapFBO, depthMap;
+	GLuint quadVAO, quadVBO;
+	vector<GLfloat> quadVertices = {
+		-1.0f,  1.0f, 0.0f, 
+		-1.0f, -1.0f, 0.0f, 
+		1.0f,  1.0f, 0.0f, 
+		1.0f, -1.0f, 0.0f,
+	};
+
 	//set up depth map
 	const int SHADOW_WIDTH = 640;
 	const int SHADOW_HEIGHT = 480;
@@ -86,6 +94,49 @@ public:
 		-100.0f, -100.0f,  100.0f,
 		100.0f, -100.0f,  100.0f
 	};
+
+	GLuint planeVAO, planeVBO,planeNBO,planeTBO,planeEBO;
+	vector<GLfloat> planeVertices = {
+		// positions            // normals         // texcoords
+		50.0f, -0.5f,  50.0f,  0.0f, 1.0f, 0.0f,  25.0f,  0.0f,
+		-50.0f, -0.5f,  50.0f,  0.0f, 1.0f, 0.0f,   0.0f,  0.0f,
+		-50.0f, -0.5f, -50.0f,  0.0f, 1.0f, 0.0f,   0.0f, 25.0f,
+
+		50.0f, -0.5f,  50.0f,  0.0f, 1.0f, 0.0f,  25.0f,  0.0f,
+		-50.0f, -0.5f, -50.0f,  0.0f, 1.0f, 0.0f,   0.0f, 25.0f,
+		50.0f, -0.5f, -50.0f,  0.0f, 1.0f, 0.0f,  25.0f, 25.0f
+	};
+	vector<vec3> planeVector = {
+		// positions          
+		vec3(25.0f, -0.5f,  25.0f),
+		vec3( -25.0f, -0.5f,  25.0f),
+		vec3( -25.0f, -0.5f, -25.0f),
+
+		vec3(25.0f, -0.5f,  25.0f),
+		vec3 (-25.0f, -0.5f, -25.0f),
+		vec3(25.0f, -0.5f, -25.0f)
+	};
+
+	vector<vec3> planeNorms = {
+		vec3(0.0f, 1.0f, 0.0f),
+		vec3(0.0f, 1.0f, 0.0f),
+		vec3(0.0f, 1.0f, 0.0f),
+		vec3(0.0f, 1.0f, 0.0f),
+		vec3(0.0f, 1.0f, 0.0f),
+		vec3(0.0f, 1.0f, 0.0f)
+	};
+
+	vector<vec2> planeTex = {
+		vec2(25.0f,  0.0f),
+		vec2(0.0f,  0.0f),
+		vec2(0.0f, 25.0f),
+		vec2(25.0f,  0.0f),
+		vec2(0.0f, 25.0f),
+		vec2(25.0f, 25.0f)
+	};
+	GLuint woodTexture;
+	vector<GLuint> planeIndices = { 0,1,2,3,4,5 };
+	GLuint loadTexture(char const * path);
 	~Scene();
 };
 
