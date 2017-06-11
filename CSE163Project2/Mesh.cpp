@@ -51,8 +51,6 @@ void Mesh::readFile(const char* filename)
 	{
 		int lineCount = 0;
 		int vertexCount = 0;
-
-
 		while (getline(in, str))
 		{
 			if ((str.find_first_not_of(" \t\r\n") != string::npos) && (str[0] != '#'))
@@ -70,7 +68,6 @@ void Mesh::readFile(const char* filename)
 				//second line
 				else if(lineCount == 1)
 				{
-			
 					vertexCount = stoi(tokens[0]);
 					//faceCount = stoi(tokens[1]);
 					this->numVertices = vertexCount;
@@ -120,7 +117,6 @@ void Mesh::readFile(const char* filename)
 		this->vtNorms.push_back(vertexNormal);
 	}
 
-	cout << faceCount << endl;
 }
 
 
@@ -162,7 +158,7 @@ void Mesh::setupMesh()
 //draw the depth map into the framebuffer
 void Mesh::drawDepth(Shader& shader)
 {
-	//glUniformMatrix4fv(glGetUniformLocation(shader.Program, "model"), 1, GL_FALSE, glm::value_ptr(this->model));
+	glUniformMatrix4fv(glGetUniformLocation(shader.Program, "model"), 1, GL_FALSE, glm::value_ptr(this->model));
 	glBindVertexArray(this->VAO);
 	glDrawElements(GL_TRIANGLES, this->indices.size(), GL_UNSIGNED_INT, 0);
 	glBindVertexArray(0);
@@ -182,27 +178,26 @@ void Mesh::Draw(Shader& shader,mat4 view,mat4 projection) {
 	
 
 	//set up material properties
-	glUniform4f(glGetUniformLocation(shader.Program, "mtl.ambient"), 0.4f, 0.1f, 0.3f,1.0f);
-	glUniform4f(glGetUniformLocation(shader.Program, "mtl.diffuse"), 1.0f, 1.0f, 1.0f,1.0f);
-	glUniform4f(glGetUniformLocation(shader.Program, "mtl.specular"), 1.0f, 1.0f, 1.0f,1.0f);
+	glUniform4f(glGetUniformLocation(shader.Program, "mtl.ambient"), this->mtl.ambient[0], this->mtl.ambient[1], this->mtl.ambient[2],1.0f);
+	glUniform4f(glGetUniformLocation(shader.Program, "mtl.diffuse"), this->mtl.diffuse[0], this->mtl.diffuse[1], this->mtl.diffuse[2], 1.0f);
+	glUniform4f(glGetUniformLocation(shader.Program, "mtl.specular"), this->mtl.specular[0], this->mtl.specular[1], this->mtl.specular[2], 1.0f);
 	glUniform1f(glGetUniformLocation(shader.Program, "mtl.shininess"), 100.0f);
 	 
-	
-
 	//set up lights
 	GLfloat positions[8];
 	GLfloat colors[8];
 	//glm::vec4 light1Pos = vec4(0.6f, 0.0f, 0.1f, 0.0f);
 	//glm::vec4 light1Pos = vec4(0.0f, 100.0f, 0.0f, 0.0f);
-	glm::vec4 light1Pos = vec4(-2.0f, 4.0f, -1.0f, 0.0f);
+	glm::vec4 light1Pos = vec4(-2.0f, 2.0f, -1.0f, 0.0f);
+	light1Pos = view*light1Pos;
 	//light1Pos = view*light1Pos;
-	glm::vec4 light1Col = vec4(0.5f, 0.5f, 1.0f, 1.0f);
+	glm::vec4 light1Col = vec4(0.8f, 0.9f, 0.3f, 1.0f);
 	for (int i = 0; i < 4; i++)
 	{
 		positions[i] = light1Pos[i];
 		colors[i] = light1Col[i];
 	}
-	//
+	
 	//vec4 light2Pos = vec4(0.0f, -0.6f, 0.1f, 1.0f);
 	////light2Pos = modelview*light2Pos;
 	//vec4 light2Col = vec4(0.5f, 0.5, 1.0f, 1.0f);

@@ -65,7 +65,9 @@ int main(int argc, char* argv[])
 		OutputDebugString(buff);
 	}
 	Scene myScene = Scene(argv[1]);
+	myScene.cameraPos = eye;
 	myScene.setupScene();
+	myScene.lightPos = vec3(-2.0f, 10.0f, -1.0f);
 	float rotation = 1.0f;
 	float tx = 0;
 	float ty = 0;
@@ -76,7 +78,7 @@ int main(int argc, char* argv[])
 	do
 	{
 		glfwPollEvents();
-		glClearColor(0.753, 0.753, 0.753, 0);
+		glClearColor(0.253, 0.253, 0.253, 0);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	
 		//take in keyboard input
@@ -137,7 +139,7 @@ int main(int argc, char* argv[])
 		{
 			printUsage();
 		}
-
+		myScene.cameraPos = eye;
 		view = glm::lookAt(eye, center, up);
 		view = glm::translate(view, vec3(tx, ty, tz));
 		view = glm::scale(view, vec3(sc, sc, sc));

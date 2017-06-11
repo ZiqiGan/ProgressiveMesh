@@ -49,6 +49,9 @@
     <None Include="debug.frag.glsl">
       <Filter>shaders</Filter>
     </None>
+    <None Include="texture.frag.glsl">
+      <Filter>shaders</Filter>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Mesh.h">

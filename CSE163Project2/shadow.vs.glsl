@@ -4,23 +4,25 @@ layout (location = 1) in vec3 normal;
 layout (location = 2) in vec2 texCoords;
 
 out vec2 TexCoords;
-out vec3 fragPos;
+out vec3 cubeCoords;
 out vec3 mynormal;
 out vec4 myvertex;
-out vec4 fragPosLightSpace;
-
+out vec4 shadowCoords;
+out vec3 reflectNormal;
 
 uniform mat4 model;
 uniform mat4 view;
 uniform mat4 projection;
-uniform mat4 lightSpaceMatrix;
+uniform mat4 depthBiasMatrix;
+
 
 void main()
 {
-	fragPos = vec3(model*vec4(position,1.0f));
 	TexCoords = texCoords;
-	fragPosLightSpace = lightSpaceMatrix * vec4(fragPos,1.0f);
-    gl_Position = projection *view*model*vec4(position, 1.0f);
+	cubeCoords = position;
+	shadowCoords = depthBiasMatrix*vec4(position,1.0f);
+    gl_Position = projection*view*model*vec4(position, 1.0f);
+	reflectNormal = mat3(transpose(inverse(model)))*normal;
 	mynormal = normal;
 	myvertex = vec4(position,1.0f);
 

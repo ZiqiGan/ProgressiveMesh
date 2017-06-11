@@ -127,6 +127,7 @@
     <None Include="depth.frag.glsl" />
     <None Include="skybox.frag.glsl" />
     <None Include="skybox.vs.glsl" />
+    <None Include="texture.frag.glsl" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="image.h" />

@@ -57,10 +57,10 @@ struct Vertex {
 
 //define Material structure
 struct Material {
-	aiColor3D ambient;
-	aiColor3D diffuse;
-	aiColor3D specular;
-	float shininess = 0;
+	vec3 ambient;
+	vec3 diffuse;
+	vec3 specular;
+	float shininess = 100.f;
 };
 
 //define Light Structure
@@ -78,7 +78,7 @@ public:
 	vector<vec3> vtPos;
 	vector<vec3> vtNorms;
 	int numVertices;
-	Material mtl;
+	Material mtl = Material();
 	Mesh();   
 	void readFile(const char* filename);
 	void setupMesh();
