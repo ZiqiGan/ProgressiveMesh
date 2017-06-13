@@ -135,6 +135,14 @@ int main(int argc, char* argv[])
 		{
 			sc -= 0.003f;
 		}
+		else if (glfwGetKey(window, GLFW_KEY_L) == GLFW_PRESS)
+		{
+			myScene.pointLightPos.z += 0.1f;
+		}
+		else if (glfwGetKey(window, GLFW_KEY_K) == GLFW_PRESS)
+		{
+			myScene.pointLightPos.z -= 0.1f;
+		}
 		else if (glfwGetKey(window, GLFW_KEY_H) == GLFW_PRESS)
 		{
 			printUsage();

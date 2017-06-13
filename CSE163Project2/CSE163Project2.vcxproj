@@ -119,6 +119,14 @@
     <None Include="debug.vs.glsl" />
     <None Include="em.frag.glsl" />
     <None Include="packages.config" />
+    <None Include="pbr.frag.glsl" />
+    <None Include="pbr.vs.glsl" />
+    <None Include="pointDepth.frag.glsl" />
+    <None Include="pointDepth.gs.glsl" />
+    <None Include="pointDepth.vs.glsl" />
+    <None Include="pointShadow.frag.glsl" />
+    <None Include="pointShadow.vs.glsl" />
+    <None Include="pointShadowCube.frag.glsl" />
     <None Include="shader.frag.glsl" />
     <None Include="shader.vs.glsl" />
     <None Include="shadow.frag.glsl" />
@@ -127,7 +135,6 @@
     <None Include="depth.frag.glsl" />
     <None Include="skybox.frag.glsl" />
     <None Include="skybox.vs.glsl" />
-    <None Include="texture.frag.glsl" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="image.h" />

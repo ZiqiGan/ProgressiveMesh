@@ -63,7 +63,7 @@ void main()
 	vec4 _mypos = modelview * myvertex;
 	vec3 mypos = _mypos.xyz / _mypos.w ;
 	vec3 eyedirn = normalize(eyepos-mypos);
-	fragColor = myvertex;
+
 	mat4 normalInverse = inverse(modelview);
     mat4 normalInverseTranspose = transpose(normalInverse);
     vec3 _normal = (normalInverseTranspose*vec4(mynormal,0.0)).xyz ; 
@@ -121,6 +121,7 @@ void main()
 	vec3 I = normalize(eyedirn-viewPos);
 	vec3 R = reflect(I,normalize(reflectNormal));
 	vec4 reflectedColor = vec4(texture(skybox,R).rgb,1.0f); 
+	//fragColor = reflectedColor;
 	fragColor = mix(finalColor,reflectedColor,0.7);
-
+	//fragColor = finalColor;
 } 

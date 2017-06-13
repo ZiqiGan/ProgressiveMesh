@@ -77,17 +77,20 @@ public:
 	vector<GLuint> indices;
 	vector<vec3> vtPos;
 	vector<vec3> vtNorms;
+	vector<vec2> texCoords;
 	int numVertices;
 	Material mtl = Material();
 	Mesh();   
 	void readFile(const char* filename);
 	void setupMesh();
+	void setupWidthTexCoords();
 	void drawDepth(Shader & shader);
+	void drawShadowRoom(const Shader& shader);
 	void Draw(Shader& shader, mat4 view,mat4 projection);
 	glm::mat4 model = mat4(1.0f);
 
 private:
-	GLuint VAO, VBO,NBO, EBO;
+	GLuint VAO, VBO,NBO, EBO,TBO;
 
 };
 

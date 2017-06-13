@@ -12,32 +12,17 @@ public:
 	const char* fileName;
 	Scene(const char* path);
 	void setupScene();
+	void setupPointDepthFrameBuffer();
 	void setupFrameBuffer();
 	void setupPlane();
+	void setupRoom();
 	void render(const mat4 & projection, const mat4 & modelview);
 	void drawPlane(Shader & shader, const mat4 view, const mat4 projection);
 	void renderScene( Shader & shader,const mat4 view, const mat4 projection);
 	unsigned int loadCubemap(vector<std::string> faces);
 	vector<std::string> cubeFaces
 	{
-		//"skybox/ame_ash/ashcanyon_rt.tga",
-		//"skybox/ame_ash/ashcanyon_lf.tga",
-		//"skybox/ame_ash/ashcanyon_up.tga",
-		//"skybox/ame_ash/ashcanyon_dn.tga",
-		//"skybox/ame_ash/ashcanyon_ft.tga",
-		//"skybox/ame_ash/ashcanyon_bk.tga"
-		////"skybox/sahara/sahara_rt.tga",
-		////"skybox/sahara/sahara_lf.tga",
-		////"skybox/sahara/sahara_up.tga",
-		////"skybox/sahara/sahara_dn.tga",
-		////"skybox/sahara/sahara_ft.tga",
-		////"skybox/sahara/sahara_bk.tga"
-	/*	"skybox/lake/right.jpg",
-		"skybox/lake/left.jpg",
-		"skybox/lake/top.jpg",
-		"skybox/lake/bottom.jpg",
-		"skybox/lake/back.jpg",
-		"skybox/lake/front.jpg"*/
+
 		"skybox/room/posx.jpg",
 		"skybox/room/negx.jpg",
 		"skybox/room/posy.jpg",
@@ -47,9 +32,12 @@ public:
 
 	};
 	vec3 cameraPos;
-	vec3 lightPos = vec4(-2.0f, 2.0f, -1.0f, 0.0f);;
+	vec3 lightPos = vec4(-2.0f, 2.0f, -1.0f, 0.0f);
+	vec3 pointLightPos = vec3(0.0f, 10.0f, 0.0f);
 	GLuint skyboxVAO, skyboxVBO, skyboxEBO;
 	GLuint depthMapFBO, depthMap;
+	GLuint pointDepthMapFBO;
+	GLuint depthCubeMap;
 	GLuint cubemapTexture;
 	//set up depth map
 	const int SHADOW_WIDTH = 640;
@@ -99,6 +87,101 @@ public:
 		100.0f, -100.0f,  100.0f
 	};
 
+	//vector<GLfloat>  roomVertices = {
+	//	// back face
+	//	-1.0f, -1.0f, -1.0f,  0.0f,  0.0f, -1.0f, 0.0f, 0.0f, // bottom-left
+	//	1.0f,  1.0f, -1.0f,  0.0f,  0.0f, -1.0f, 1.0f, 1.0f, // top-right
+	//	1.0f, -1.0f, -1.0f,  0.0f,  0.0f, -1.0f, 1.0f, 0.0f, // bottom-right         
+	//	1.0f,  1.0f, -1.0f,  0.0f,  0.0f, -1.0f, 1.0f, 1.0f, // top-right
+	//	-1.0f, -1.0f, -1.0f,  0.0f,  0.0f, -1.0f, 0.0f, 0.0f, // bottom-left
+	//	-1.0f,  1.0f, -1.0f,  0.0f,  0.0f, -1.0f, 0.0f, 1.0f, // top-left
+	//														  // front face
+	//	-1.0f, -1.0f,  1.0f,  0.0f,  0.0f,  1.0f, 0.0f, 0.0f, // bottom-left
+	//	1.0f, -1.0f,  1.0f,  0.0f,  0.0f,  1.0f, 1.0f, 0.0f, // bottom-right
+	//	1.0f,  1.0f,  1.0f,  0.0f,  0.0f,  1.0f, 1.0f, 1.0f, // top-right
+	//	1.0f,  1.0f,  1.0f,  0.0f,  0.0f,  1.0f, 1.0f, 1.0f, // top-right
+	//	-1.0f,  1.0f,  1.0f,  0.0f,  0.0f,  1.0f, 0.0f, 1.0f, // top-left
+	//	-1.0f, -1.0f,  1.0f,  0.0f,  0.0f,  1.0f, 0.0f, 0.0f, // bottom-left
+	//														  // left face
+	//	-1.0f,  1.0f,  1.0f, -1.0f,  0.0f,  0.0f, 1.0f, 0.0f, // top-right
+	//	-1.0f,  1.0f, -1.0f, -1.0f,  0.0f,  0.0f, 1.0f, 1.0f, // top-left
+	//	-1.0f, -1.0f, -1.0f, -1.0f,  0.0f,  0.0f, 0.0f, 1.0f, // bottom-left
+	//	-1.0f, -1.0f, -1.0f, -1.0f,  0.0f,  0.0f, 0.0f, 1.0f, // bottom-left
+	//	-1.0f, -1.0f,  1.0f, -1.0f,  0.0f,  0.0f, 0.0f, 0.0f, // bottom-right
+	//	-1.0f,  1.0f,  1.0f, -1.0f,  0.0f,  0.0f, 1.0f, 0.0f, // top-right
+	//														  // right face
+	//	1.0f,  1.0f,  1.0f,  1.0f,  0.0f,  0.0f, 1.0f, 0.0f, // top-left
+	//	1.0f, -1.0f, -1.0f,  1.0f,  0.0f,  0.0f, 0.0f, 1.0f, // bottom-right
+	//	1.0f,  1.0f, -1.0f,  1.0f,  0.0f,  0.0f, 1.0f, 1.0f, // top-right         
+	//	1.0f, -1.0f, -1.0f,  1.0f,  0.0f,  0.0f, 0.0f, 1.0f, // bottom-right
+	//	1.0f,  1.0f,  1.0f,  1.0f,  0.0f,  0.0f, 1.0f, 0.0f, // top-left
+	//	1.0f, -1.0f,  1.0f,  1.0f,  0.0f,  0.0f, 0.0f, 0.0f, // bottom-left     
+	//														 // bottom face
+	//	-1.0f, -1.0f, -1.0f,  0.0f, -1.0f,  0.0f, 0.0f, 1.0f, // top-right
+	//	1.0f, -1.0f, -1.0f,  0.0f, -1.0f,  0.0f, 1.0f, 1.0f, // top-left
+	//	1.0f, -1.0f,  1.0f,  0.0f, -1.0f,  0.0f, 1.0f, 0.0f, // bottom-left
+	//	1.0f, -1.0f,  1.0f,  0.0f, -1.0f,  0.0f, 1.0f, 0.0f, // bottom-left
+	//	-1.0f, -1.0f,  1.0f,  0.0f, -1.0f,  0.0f, 0.0f, 0.0f, // bottom-right
+	//	-1.0f, -1.0f, -1.0f,  0.0f, -1.0f,  0.0f, 0.0f, 1.0f, // top-right
+	//														  // top face
+	//	-1.0f,  1.0f, -1.0f,  0.0f,  1.0f,  0.0f, 0.0f, 1.0f, // top-left
+	//	1.0f,  1.0f , 1.0f,  0.0f,  1.0f,  0.0f, 1.0f, 0.0f, // bottom-right
+	//	1.0f,  1.0f, -1.0f,  0.0f,  1.0f,  0.0f, 1.0f, 1.0f, // top-right     
+	//	1.0f,  1.0f,  1.0f,  0.0f,  1.0f,  0.0f, 1.0f, 0.0f, // bottom-right
+	//	-1.0f,  1.0f, -1.0f,  0.0f,  1.0f,  0.0f, 0.0f, 1.0f, // top-left
+	//	-1.0f,  1.0f,  1.0f,  0.0f,  1.0f,  0.0f, 0.0f, 0.0f  // bottom-left    
+	//};
+
+
+
+	vector<GLfloat>  roomVertices = {
+		// back face
+		-25.0f, -25.0f, -25.0f,  0.0f,  0.0f, -1.0f, 0.0f, 0.0f, // bottom-left
+		25.0f,  25.0f, -25.0f,  0.0f,  0.0f, -1.0f, 25.0f, 25.0f, // top-right
+		25.0f, -25.0f, -25.0f,  0.0f,  0.0f, -1.0f, 25.0f, 0.0f, // bottom-right         
+		25.0f,  25.0f, -25.0f,  0.0f,  0.0f, -1.0f, 25.0f, 25.0f, // top-right
+		-25.0f, -25.0f, -25.0f,  0.0f,  0.0f, -1.0f, 0.0f, 0.0f, // bottom-left
+		-25.0f,  25.0f, -25.0f,  0.0f,  0.0f, -1.0f, 0.0f, 25.0f, // top-left
+																		// front face
+		-25.0f, -25.0f,  25.0f,  0.0f,  0.0f,  1.0f, 0.0f, 0.0f, // bottom-left
+		25.0f, -25.0f,  25.0f,  0.0f,  0.0f,  1.0f, 25.0f, 0.0f, // bottom-right
+		25.0f,  25.0f,  25.0f,  0.0f,  0.0f,  1.0f, 25.0f, 25.0f, // top-right
+		25.0f,  25.0f,  25.0f,  0.0f,  0.0f,  1.0f, 25.0f, 25.0f, // top-right
+		-25.0f,  25.0f,  25.0f,  0.0f,  0.0f,  1.0f, 0.0f, 25.0f, // top-left
+		-25.0f, -25.0f,  25.0f,  0.0f,  0.0f,  1.0f, 0.0f, 0.0f, // bottom-left
+																	  // left face
+		-25.0f,  25.0f,  25.0f, -1.0f,  0.0f,  0.0f, 25.0f, 0.0f, // top-right
+		-25.0f,  25.0f, -25.0f, -1.0f,  0.0f,  0.0f, 25.0f, 25.0f, // top-left
+		-25.0f, -25.0f, -25.0f, -1.0f,  0.0f,  0.0f, 0.0f, 25.0f, // bottom-left
+		-25.0f, -25.0f, -25.0f, -1.0f,  0.0f,  0.0f, 0.0f, 25.0f, // bottom-left
+		-25.0f, -25.0f,  25.0f, -1.0f,  0.0f,  0.0f, 0.0f, 0.0f, // bottom-right
+		-25.0f,  25.0f,  25.0f, -1.0f,  0.0f,  0.0f, 25.0f, 0.0f, // top-right
+																		// right face
+		25.0f,  25.0f,  25.0f,  1.0f,  0.0f,  0.0f, 25.0f, 0.0f, // top-left
+		25.0f, -25.0f, -25.0f,  1.0f,  0.0f,  0.0f, 0.0f, 25.0f, // bottom-right
+		25.0f,  25.0f, -25.0f,  1.0f,  0.0f,  0.0f, 25.0f, 25.0f, // top-right         
+		25.0f, -25.0f, -25.0f,  1.0f,  0.0f,  0.0f, 0.0f, 25.0f, // bottom-right
+		25.0f,  25.0f,  25.0f,  1.0f,  0.0f,  0.0f, 25.0f, 0.0f, // top-left
+		25.0f, -25.0f,  25.0f,  1.0f,  0.0f,  0.0f, 0.0f, 0.0f, // bottom-left     
+																	 // bottom face
+		-25.0f, -25.0f, -25.0f,  0.0f, -1.0f,  0.0f, 0.0f, 25.0f, // top-right
+		25.0f, -25.0f, -25.0f,  0.0f, -1.0f,  0.0f, 25.0f, 25.0f, // top-left
+		25.0f, -25.0f,  25.0f,  0.0f, -1.0f,  0.0f, 25.0f, 0.0f, // bottom-left
+		25.0f, -25.0f,  25.0f,  0.0f, -1.0f,  0.0f, 25.0f, 0.0f, // bottom-left
+		-25.0f, -25.0f,  25.0f,  0.0f, -1.0f,  0.0f, 0.0f, 0.0f, // bottom-right
+		-25.0f, -25.0f, -25.0f,  0.0f, -1.0f,  0.0f, 0.0f, 25.0f, // top-right
+																		// top face
+		-25.0f,  25.0f, -25.0f,  0.0f,  1.0f,  0.0f, 0.0f, 25.0f, // top-left
+		25.0f,  25.0f , 25.0f,  0.0f,  1.0f,  0.0f, 25.0f, 0.0f, // bottom-right
+		25.0f,  25.0f, -25.0f,  0.0f,  1.0f,  0.0f, 25.0f, 25.0f, // top-right     
+		25.0f,  25.0f,  25.0f,  0.0f,  1.0f,  0.0f, 25.0f, 0.0f, // bottom-right
+		-25.0f,  25.0f, -25.0f,  0.0f,  1.0f,  0.0f, 0.0f, 25.0f, // top-left
+		-25.0f,  25.0f,  25.0f,  0.0f,  1.0f,  0.0f, 0.0f, 0.0f  // bottom-left    
+	};
+	GLuint roomVAO, roomVBO;
+
+
+
 	GLuint planeVAO, planeVBO;
 	vector<GLfloat> planeVertices = {
 		// positions            // normals         // texcoords
@@ -110,18 +193,9 @@ public:
 		-20.0f, -0.5f, -20.0f,  0.0f, 1.0f, 0.0f,   0.0f, 25.0f,
 		20.0f, -0.5f, -20.0f,  0.0f, 1.0f, 0.0f,  20.0f, 20.0f
 	};
-	//vector<GLfloat> planeVertices = {
-	//	// positions            // normals         // texcoords
-	//	5.0, -0.5f,  5.0,  0.0f, 1.0f, 0.0f,  5.0,  0.0f,
-	//	-5.0, -0.5f,  5.0,  0.0f, 1.0f, 0.0f,   0.0f,  0.0f,
-	//	-5.0, -0.5f, -5.0,  0.0f, 1.0f, 0.0f,   0.0f, 5.0,
-
-	//	5.0, -0.5f,  5.0,  0.0f, 1.0f, 0.0f,  5.0,  0.0f,
-	//	-5.0, -0.5f, -5.0,  0.0f, 1.0f, 0.0f,   0.0f, 5.0,
-	//	5.0, -0.5f, -5.0,  0.0f, 1.0f, 0.0f,  5.0, 5.0
-	//};
 
 	GLuint woodTexture;
+	GLuint albedo, normal, metallic, roughness,ao;
 	GLuint loadTexture(char const * path);
 	~Scene();
 };

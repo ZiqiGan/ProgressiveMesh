@@ -49,7 +49,28 @@
     <None Include="debug.frag.glsl">
       <Filter>shaders</Filter>
     </None>
-    <None Include="texture.frag.glsl">
+    <None Include="pbr.vs.glsl">
+      <Filter>shaders</Filter>
+    </None>
+    <None Include="pbr.frag.glsl">
+      <Filter>shaders</Filter>
+    </None>
+    <None Include="pointDepth.frag.glsl">
+      <Filter>shaders</Filter>
+    </None>
+    <None Include="pointDepth.gs.glsl">
+      <Filter>shaders</Filter>
+    </None>
+    <None Include="pointDepth.vs.glsl">
+      <Filter>shaders</Filter>
+    </None>
+    <None Include="pointShadow.vs.glsl">
+      <Filter>shaders</Filter>
+    </None>
+    <None Include="pointShadow.frag.glsl">
+      <Filter>shaders</Filter>
+    </None>
+    <None Include="pointShadowCube.frag.glsl">
       <Filter>shaders</Filter>
     </None>
   </ItemGroup>

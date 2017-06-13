@@ -1,5 +1,6 @@
 ﻿  Scene.cpp
-c:\users\chunc\desktop\coursework\cse\cse163\assignment3\cse163hw2\cse163project2\scene.cpp(120): warning C4018: '<': signed/unsigned mismatch
-c:\users\chunc\desktop\coursework\cse\cse163\assignment3\cse163hw2\cse163project2\scene.cpp(227): warning C4018: '<': signed/unsigned mismatch
+c:\users\chunc\desktop\coursework\cse\cse163\assignment3\cse163hw2\cse163project2\scene.cpp(183): warning C4018: '<': signed/unsigned mismatch
+c:\users\chunc\desktop\coursework\cse\cse163\assignment3\cse163hw2\cse163project2\scene.cpp(221): warning C4018: '<': signed/unsigned mismatch
+c:\users\chunc\desktop\coursework\cse\cse163\assignment3\cse163hw2\cse163project2\scene.cpp(422): warning C4018: '<': signed/unsigned mismatch
   CSE163Project2.vcxproj -> C:\Users\chunc\Desktop\Coursework\CSE\CSE163\Assignment3\CSE163HW2\Debug\CSE163Project2.exe
   CSE163Project2.vcxproj -> C:\Users\chunc\Desktop\Coursework\CSE\CSE163\Assignment3\CSE163HW2\Debug\CSE163Project2.pdb (Partial PDB)

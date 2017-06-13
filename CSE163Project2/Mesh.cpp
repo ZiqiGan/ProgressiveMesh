@@ -7,21 +7,7 @@
 #include <stdlib.h>
 
 using namespace std;
-bool readvals(stringstream &s, const int numvals, GLfloat* values)
-{
-	for (int i = 0; i < numvals; i++)
-	{
-		s >> values[i];
-		if (s.fail())
-		{
-			cout << "Failed reading value " << i << "will skip\n";
-			return false;
-		}
-	}
-	return true;
-}
-
-
+const float PI = 3.14159265359;
 std::vector<std::string>& split(const std::string &s, char delim, std::vector<std::string> &elems)
 {
 	std::stringstream ss(s);
@@ -115,6 +101,11 @@ void Mesh::readFile(const char* filename)
 		vertexNormal = glm::normalize(vertexNormal);
 		vertices[i]->Normal = vertexNormal;
 		this->vtNorms.push_back(vertexNormal);
+		float x = vertexNormal[0];
+		float y = vertexNormal[1];
+		float u = asin(x) / PI + 0.5;
+		float v = asin(y) / PI + 0.5;
+		this->texCoords.push_back(vec2(u, v));
 	}
 
 }
@@ -126,9 +117,10 @@ void Mesh::setupMesh()
 	glGenBuffers(1, &this->VBO);
 	glGenBuffers(1, &this->NBO);
 	glGenBuffers(1, &this->EBO);
+	glGenBuffers(1, &this->TBO);
 
 	glBindVertexArray(this->VAO);
-
+	
 	glBindBuffer(GL_ARRAY_BUFFER, this->VBO);
 	glBufferData(GL_ARRAY_BUFFER, sizeof(vec3)*this->numVertices,
 		&this->vtPos[0], GL_STATIC_DRAW);
@@ -155,6 +147,50 @@ void Mesh::setupMesh()
 
 }
 
+void Mesh::setupWidthTexCoords()
+{
+	glGenVertexArrays(1, &this->VAO);
+	glGenBuffers(1, &this->VBO);
+	glGenBuffers(1, &this->NBO);
+	glGenBuffers(1, &this->EBO);
+	glGenBuffers(1, &this->TBO);
+
+	glBindVertexArray(this->VAO);
+
+	glBindBuffer(GL_ARRAY_BUFFER, this->VBO);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(vec3)*this->numVertices,
+		&this->vtPos[0], GL_STATIC_DRAW);
+	// Vertex Positions to layout location 0
+	glEnableVertexAttribArray(0);
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(vec3),
+		(GLvoid*)0);
+
+	glBindBuffer(GL_ARRAY_BUFFER, this->NBO);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(vec3)*this->numVertices,
+		&this->vtNorms[0], GL_STATIC_DRAW);
+	// Vertex Normals to layout location 1
+	glEnableVertexAttribArray(1);
+	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(vec3),
+		(GLvoid*)0);
+
+	//Texture coordinates to layout location 2
+	glBindBuffer(GL_ARRAY_BUFFER, this->TBO);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(vec2)*this->numVertices,
+		&this->texCoords[0], GL_STATIC_DRAW);
+	glEnableVertexAttribArray(2);
+	glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, sizeof(vec2),
+		(GLvoid*)0);
+
+	//indices array
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, this->EBO);
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(unsigned int)*indices.size(),
+		&this->indices[0], GL_STATIC_DRAW);
+
+	glBindBuffer(GL_ARRAY_BUFFER, 0);
+	glBindVertexArray(0);
+}
+
+
 //draw the depth map into the framebuffer
 void Mesh::drawDepth(Shader& shader)
 {
@@ -164,7 +200,21 @@ void Mesh::drawDepth(Shader& shader)
 	glBindVertexArray(0);
 }
 
+void Mesh::drawShadowRoom(const Shader& shader)
+{
+	//set up material properties
+	glUniform3f(glGetUniformLocation(shader.Program, "mtl.ambient"), this->mtl.ambient[0], this->mtl.ambient[1], this->mtl.ambient[2]);
+	glUniform3f(glGetUniformLocation(shader.Program, "mtl.diffuse"), this->mtl.diffuse[0], this->mtl.diffuse[1], this->mtl.diffuse[2]);
+	glUniform3f(glGetUniformLocation(shader.Program, "mtl.specular"), this->mtl.specular[0], this->mtl.specular[1], this->mtl.specular[2]);
+	glUniform1f(glGetUniformLocation(shader.Program, "mtl.shininess"), 100.0f);
+	glm::vec3 lightCol = vec3(0.8f, 0.9f, 0.3f);
+	glUniform3f(glGetUniformLocation(shader.Program, "lightColor"), lightCol[0], lightCol[1], lightCol[2]);
+	glUniformMatrix4fv(glGetUniformLocation(shader.Program, "model"), 1, GL_FALSE, glm::value_ptr(this->model));
+	glBindVertexArray(this->VAO);
+	glDrawElements(GL_TRIANGLES, this->indices.size(), GL_UNSIGNED_INT, 0);
+	glBindVertexArray(0);
 
+}
 void Mesh::Draw(Shader& shader,mat4 view,mat4 projection) {
 
 	

@@ -7,7 +7,7 @@ out vec3 mynormal;
 out vec4 myvertex;
 
 
-uniform mat4 modelview;
+uniform mat4 view;
 uniform mat4 projection;
 
 void main()
