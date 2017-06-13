@@ -4,67 +4,151 @@
 #include <iostream>
 #include "image.h"
 
-Scene::Scene(const char * path)
+Scene::Scene()
 {
-	this->fileName = path;
-	object = Mesh();
+
 }
 
-void Scene::setupScene()
+void Scene::setupScene(int mode)
 {
-	object.readFile(this->fileName);
-	object.mtl.ambient = vec3(0.2f, 0.6f, 0.1f);
-	object.mtl.diffuse = vec3(1.0f, 1.0f, 1.0f);
-	object.mtl.specular = vec3(1.0f, 1.0f, 1.0f);
-	object.model = glm::translate(object.model, vec3(0.0f, 0.0f, -20.0f));
-	this->objects.push_back(object);
+	if (mode == 0)
+	{
+		Mesh object1;
+		object1.readFile("./models/teapot.off");
+		object1.mtl.ambient = vec3(0.2f, 0.2f, 0.7f);
+		object1.mtl.diffuse = vec3(1.0f, 1.0f, 1.0f);
+		object1.mtl.specular = vec3(1.0f, 1.0f, 1.0f);
+		//object1.model = glm::translate(object.model, vec3(0.0f, 0.0f, -20.0f));
+		this->objects.push_back(object1);
 
 
-	Mesh object2;
-	object2.readFile("./models/sphere.off");
-	object2.model = glm::translate(object2.model, vec3(-15.0f, 15.0f, -15.0f));
-	object2.model = glm::scale(object2.model, vec3(4.0f, 4.0f, 4.0f));
-	object2.mtl.ambient = vec3(0.2f, 0.6f, 0.1f);
-	object2.mtl.diffuse = vec3(1.0f, 1.0f, 1.0f);
-	object2.mtl.specular = vec3(1.0f, 1.0f, 1.0f);
-	this->objects.push_back(object2);
+		Mesh object2;
+		object2.readFile("./models/sphere.off");
+		//object2.model = glm::translate(object2.model, vec3(-15.0f, 15.0f, -15.0f));
+		object2.model = glm::translate(object2.model, vec3(-8.0f, 1.2f, 0.0f));
+		//object2.model = glm::scale(object2.model, vec3(4.0f, 4.0f, 4.0f));
+		object2.mtl.ambient = vec3(0.2f, 0.6f, 0.1f);
+		object2.mtl.diffuse = vec3(1.0f, 1.0f, 1.0f);
+		object2.mtl.specular = vec3(1.0f, 1.0f, 1.0f);
+		this->objects.push_back(object2);
+
+		setupFrameBuffer();
+		setupPlane();
+	}
+	else if (mode == 1)
+	{
+		Mesh object1;
+		object1.readFile("./models/teapot.off");
+		object1.mtl.ambient = vec3(0.2f, 0.2f, 0.7f);
+		object1.mtl.diffuse = vec3(1.0f, 1.0f, 1.0f);
+		object1.mtl.specular = vec3(1.0f, 1.0f, 1.0f);
+		//object1.model = glm::translate(object.model, vec3(0.0f, 0.0f, -20.0f));
+		this->objects.push_back(object1);
 
 
-	Mesh object3;
-	object3.readFile("./models/cow.off");
-	object3.model = glm::translate(object3.model, vec3(20.0f, -1.2f, 0));
-	//object3.model = glm::scale(object3.model, vec3(0.3f, 0.3f, 0.3f));
-	object3.mtl.ambient = vec3(0.2f, 0.6f, 0.1f);
-	object3.mtl.diffuse = vec3(1.0f, 1.0f, 1.0f);
-	object3.mtl.specular = vec3(1.0f, 1.0f, 1.0f);
-	this->objects.push_back(object3);
+		Mesh object2;
+		object2.readFile("./models/sphere.off");
+		//object2.model = glm::translate(object2.model, vec3(-15.0f, 15.0f, -15.0f));
+		object2.model = glm::translate(object2.model, vec3(-8.0f, 1.2f, 0.0f));
+		//object2.model = glm::scale(object2.model, vec3(4.0f, 4.0f, 4.0f));
+		object2.mtl.ambient = vec3(0.2f, 0.6f, 0.1f);
+		object2.mtl.diffuse = vec3(1.0f, 1.0f, 1.0f);
+		object2.mtl.specular = vec3(1.0f, 1.0f, 1.0f);
+		this->objects.push_back(object2);
 
 
-	setupPlane();
-	setupFrameBuffer();
-	setupPointDepthFrameBuffer();
-	setupRoom();
-	this->cubemapTexture = loadCubemap(this->cubeFaces);
+		Mesh object3;
+		object3.readFile("./models/cow.off");
+		//object3.model = glm::translate(object3.model, vec3(20.0f, -1.2f, 0));
+		//object3.model = glm::scale(object3.model, vec3(0.3f, 0.3f, 0.3f));
+		object3.model = glm::translate(object3.model, vec3(12.0f, -1.2f, 0));
+		object3.model = glm::scale(object3.model, vec3(0.3f, 0.3f, 0.3f));
+		object3.mtl.ambient = vec3(0.6f, 0.2f, 0.1f);
+		object3.mtl.diffuse = vec3(1.0f, 1.0f, 1.0f);
+		object3.mtl.specular = vec3(1.0f, 1.0f, 1.0f);
+		this->objects.push_back(object3);
 
-	////textures for PBR
-	//this->albedo = loadTexture("./models/pbr/albedo.png");
-	//this->metallic = loadTexture("./models/pbr/metallic.png");
-	//this->normal = loadTexture("./models/pbr/normal.png");
-	//this->roughness = loadTexture("./models/pbr/roughness.png");
+		setupFrameBuffer();
+		this->cubemapTexture = loadCubemap(this->cubeFaces);
+		//setup skybox
+		glGenVertexArrays(1, &skyboxVAO);
+		glGenBuffers(1, &skyboxVBO);
+		glBindVertexArray(skyboxVAO);
 
-	//this->ao = loadTexture("./models/holey-rock1-ue/ao.png");
-	////setup skybox
-	//glGenVertexArrays(1, &skyboxVAO);
-	//glGenBuffers(1, &skyboxVBO);
-	//glBindVertexArray(skyboxVAO);
-	// 
-	//glBindBuffer(GL_ARRAY_BUFFER, skyboxVBO);
-	//glBufferData(GL_ARRAY_BUFFER, sizeof(GLfloat)*skyboxVertices.size(), &this->skyboxVertices[0], GL_STATIC_DRAW);
-	//glEnableVertexAttribArray(0);
-	//glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(GLfloat), (GLvoid*)0);
-	//glBindBuffer(GL_ARRAY_BUFFER, 0);
-	//glBindVertexArray(0);
+		glBindBuffer(GL_ARRAY_BUFFER, skyboxVBO);
+		glBufferData(GL_ARRAY_BUFFER, sizeof(GLfloat)*skyboxVertices.size(), &this->skyboxVertices[0], GL_STATIC_DRAW);
+		glEnableVertexAttribArray(0);
+		glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(GLfloat), (GLvoid*)0);
+		glBindBuffer(GL_ARRAY_BUFFER, 0);
+		glBindVertexArray(0);
+	}
+	else if (mode == 2)
+	{
+		Mesh object1;
+		object1.readFile("./models/teapot.off");
+		object1.mtl.ambient = vec3(0.2f, 0.2f, 0.7f);
+		object1.mtl.diffuse = vec3(1.0f, 1.0f, 1.0f);
+		object1.mtl.specular = vec3(1.0f, 1.0f, 1.0f);
+		object1.model = glm::translate(object1.model, vec3(0.0f, 0.0f, -20.0f));
+		this->objects.push_back(object1);
+
+
+		Mesh object2;
+		object2.readFile("./models/sphere.off");
+		object2.model = glm::translate(object2.model, vec3(-15.0f, 15.0f, -15.0f));
+		object2.model = glm::scale(object2.model, vec3(4.0f, 4.0f, 4.0f));
+		object2.mtl.ambient = vec3(0.2f, 0.6f, 0.1f);
+		object2.mtl.diffuse = vec3(1.0f, 1.0f, 1.0f);
+		object2.mtl.specular = vec3(1.0f, 1.0f, 1.0f);
+		this->objects.push_back(object2);
+
+
+		Mesh object3;
+		object3.readFile("./models/cow.off");
+		object3.model = glm::translate(object3.model, vec3(20.0f, -1.2f, 0));
+		
+		object3.model = glm::scale(object3.model, vec3(0.3f, 0.3f, 0.3f));
+		object3.mtl.ambient = vec3(0.6f, 0.2f, 0.1f);
+		object3.mtl.diffuse = vec3(1.0f, 1.0f, 1.0f);
+		object3.mtl.specular = vec3(1.0f, 1.0f, 1.0f);
+		this->objects.push_back(object3);
+
+		setupPointDepthFrameBuffer();
+		setupRoom();
+		this->cubemapTexture = loadCubemap(this->cubeFaces);
+		//setup skybox
+		glGenVertexArrays(1, &skyboxVAO);
+		glGenBuffers(1, &skyboxVBO);
+		glBindVertexArray(skyboxVAO);
+
+		glBindBuffer(GL_ARRAY_BUFFER, skyboxVBO);
+		glBufferData(GL_ARRAY_BUFFER, sizeof(GLfloat)*skyboxVertices.size(), &this->skyboxVertices[0], GL_STATIC_DRAW);
+		glEnableVertexAttribArray(0);
+		glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(GLfloat), (GLvoid*)0);
+		glBindBuffer(GL_ARRAY_BUFFER, 0);
+		glBindVertexArray(0);
+	}
+	else if (mode == 3)
+	{
+		Mesh object1;
+		object1.readFile("./models/teapot.off");
+		object1.mtl.ambient = vec3(0.2f, 0.2f, 0.7f);
+		object1.mtl.diffuse = vec3(1.0f, 1.0f, 1.0f);
+		object1.mtl.specular = vec3(1.0f, 1.0f, 1.0f);
+		//object1.model = glm::translate(object1.model, vec3(0.0f, 0.0f, -20.0f));
+		this->objects.push_back(object1);
+		//textures for PBR
+		this->albedo = loadTexture("./models/pbr/albedo.png");
+		this->metallic = loadTexture("./models/pbr/metallic.png");
+		this->normal = loadTexture("./models/pbr/normal.png");
+		this->roughness = loadTexture("./models/pbr/roughness.png");
+
+		this->ao = loadTexture("./models/holey-rock1-ue/ao.png");
+	}
+	
+
 }
+
 
 void Scene::setupPointDepthFrameBuffer()
 {
@@ -144,234 +228,241 @@ void Scene::setupRoom()
 	glBindVertexArray(0);
 }
 
-void Scene::render( const mat4 & projection, const mat4 & view)
+void Scene::render( const mat4 & projection, const mat4 & view,int mode)
 {
-	Shader depthShader("./pointDepth.vs.glsl", "./pointDepth.frag.glsl","./pointDepth.gs.glsl");
-	float zNear = 1.0f;
-	float zFar = 100.0f;
-	glm::mat4 lightPorjection = glm::perspective(glm::radians(90.0f), (float)1024/(float)1024, zNear, zFar);
-	vector<mat4> lightMVPs;
-	lightMVPs.push_back(lightPorjection*glm::lookAt(this->pointLightPos, this->pointLightPos + glm::vec3(1.0f, 0.0f, 0.0f), glm::vec3(0.0f, -1.0f, 0.0f)));
-	lightMVPs.push_back(lightPorjection*glm::lookAt(this->pointLightPos, this->pointLightPos + glm::vec3(-1.0f, 0.0f, 0.0f), glm::vec3(0.0f, -1.0f, 0.0f)));
-	lightMVPs.push_back(lightPorjection*glm::lookAt(this->pointLightPos, this->pointLightPos + glm::vec3(0.0f, 1.0f, 0.0f), glm::vec3(0.0f, 0.0f, 1.0f)));
-	lightMVPs.push_back(lightPorjection*glm::lookAt(this->pointLightPos, this->pointLightPos + glm::vec3(0.0f, -1.0f, 0.0f), glm::vec3(0.0f, 0.0f, -1.0f)));
-	lightMVPs.push_back(lightPorjection*glm::lookAt(this->pointLightPos, this->pointLightPos + glm::vec3(0.0f, 0.0f, 1.0f), glm::vec3(0.0f, -1.0f, 0.0f)));
-	lightMVPs.push_back(lightPorjection*glm::lookAt(this->pointLightPos, this->pointLightPos + glm::vec3(0.0f, 0.0f, -1.0f), glm::vec3(0.0f, -1.0f, 0.0f)));
-
-	//render the scene to depth cubemap
-	glViewport(0, 0, 1024, 1024);
-	glBindFramebuffer(GL_FRAMEBUFFER, pointDepthMapFBO);
-	glClear(GL_DEPTH_BUFFER_BIT);
-	depthShader.Use();
-
-	glUniformMatrix4fv(glGetUniformLocation(depthShader.Program, "shadowMatrices[0]"), 1, GL_FALSE, glm::value_ptr(lightMVPs[0]));
-	glUniformMatrix4fv(glGetUniformLocation(depthShader.Program, "shadowMatrices[1]"), 1, GL_FALSE, glm::value_ptr(lightMVPs[1]));
-	glUniformMatrix4fv(glGetUniformLocation(depthShader.Program, "shadowMatrices[2]"), 1, GL_FALSE, glm::value_ptr(lightMVPs[2]));
-	glUniformMatrix4fv( glGetUniformLocation(depthShader.Program, "shadowMatrices[3]"), 1, GL_FALSE, glm::value_ptr(lightMVPs[3]));
-	glUniformMatrix4fv(glGetUniformLocation(depthShader.Program, "shadowMatrices[4]"), 1, GL_FALSE, glm::value_ptr(lightMVPs[4]));
-	glUniformMatrix4fv(glGetUniformLocation(depthShader.Program, "shadowMatrices[5]"), 1, GL_FALSE, glm::value_ptr(lightMVPs[5]));
-
-	glUniform1f(glGetUniformLocation(depthShader.Program, "far_plane"), zFar);
-	glUniform3f(glGetUniformLocation(depthShader.Program, "lightPos"), pointLightPos[0], pointLightPos[1], pointLightPos[2]);
-
-	glm::mat4 roomModel(1.0f);
-	//draw the room
-	glUniformMatrix4fv(glGetUniformLocation(depthShader.Program, "model"), 1, GL_FALSE, glm::value_ptr(roomModel));
-	glBindVertexArray(roomVAO);
-	glDrawArrays(GL_TRIANGLES, 0, 36);
-	glBindVertexArray(0);
-	for (int i = 0; i < this->objects.size(); i++)
+	if (mode == 2)
 	{
-		objects[i].setupMesh();
-		objects[i].drawDepth(depthShader);
+		Shader depthShader("./pointDepth.vs.glsl", "./pointDepth.frag.glsl","./pointDepth.gs.glsl");
+		float zNear = 1.0f;
+		float zFar = 100.0f;
+		glm::mat4 lightPorjection = glm::perspective(glm::radians(90.0f), (float)1024/(float)1024, zNear, zFar);
+		vector<mat4> lightMVPs;
+		lightMVPs.push_back(lightPorjection*glm::lookAt(this->pointLightPos, this->pointLightPos + glm::vec3(1.0f, 0.0f, 0.0f), glm::vec3(0.0f, -1.0f, 0.0f)));
+		lightMVPs.push_back(lightPorjection*glm::lookAt(this->pointLightPos, this->pointLightPos + glm::vec3(-1.0f, 0.0f, 0.0f), glm::vec3(0.0f, -1.0f, 0.0f)));
+		lightMVPs.push_back(lightPorjection*glm::lookAt(this->pointLightPos, this->pointLightPos + glm::vec3(0.0f, 1.0f, 0.0f), glm::vec3(0.0f, 0.0f, 1.0f)));
+		lightMVPs.push_back(lightPorjection*glm::lookAt(this->pointLightPos, this->pointLightPos + glm::vec3(0.0f, -1.0f, 0.0f), glm::vec3(0.0f, 0.0f, -1.0f)));
+		lightMVPs.push_back(lightPorjection*glm::lookAt(this->pointLightPos, this->pointLightPos + glm::vec3(0.0f, 0.0f, 1.0f), glm::vec3(0.0f, -1.0f, 0.0f)));
+		lightMVPs.push_back(lightPorjection*glm::lookAt(this->pointLightPos, this->pointLightPos + glm::vec3(0.0f, 0.0f, -1.0f), glm::vec3(0.0f, -1.0f, 0.0f)));
+
+		//render the scene to depth cubemap
+		glViewport(0, 0, 1024, 1024);
+		glBindFramebuffer(GL_FRAMEBUFFER, pointDepthMapFBO);
+		glClear(GL_DEPTH_BUFFER_BIT);
+		depthShader.Use();
+
+		glUniformMatrix4fv(glGetUniformLocation(depthShader.Program, "shadowMatrices[0]"), 1, GL_FALSE, glm::value_ptr(lightMVPs[0]));
+		glUniformMatrix4fv(glGetUniformLocation(depthShader.Program, "shadowMatrices[1]"), 1, GL_FALSE, glm::value_ptr(lightMVPs[1]));
+		glUniformMatrix4fv(glGetUniformLocation(depthShader.Program, "shadowMatrices[2]"), 1, GL_FALSE, glm::value_ptr(lightMVPs[2]));
+		glUniformMatrix4fv( glGetUniformLocation(depthShader.Program, "shadowMatrices[3]"), 1, GL_FALSE, glm::value_ptr(lightMVPs[3]));
+		glUniformMatrix4fv(glGetUniformLocation(depthShader.Program, "shadowMatrices[4]"), 1, GL_FALSE, glm::value_ptr(lightMVPs[4]));
+		glUniformMatrix4fv(glGetUniformLocation(depthShader.Program, "shadowMatrices[5]"), 1, GL_FALSE, glm::value_ptr(lightMVPs[5]));
+
+		glUniform1f(glGetUniformLocation(depthShader.Program, "far_plane"), zFar);
+		glUniform3f(glGetUniformLocation(depthShader.Program, "lightPos"), pointLightPos[0], pointLightPos[1], pointLightPos[2]);
+
+		glm::mat4 roomModel(1.0f);
+		//draw the room
+		glUniformMatrix4fv(glGetUniformLocation(depthShader.Program, "model"), 1, GL_FALSE, glm::value_ptr(roomModel));
+		glBindVertexArray(roomVAO);
+		glDrawArrays(GL_TRIANGLES, 0, 36);
+		glBindVertexArray(0);
+		for (int i = 0; i < this->objects.size(); i++)
+		{
+			objects[i].setupMesh();
+			objects[i].drawDepth(depthShader);
+		}
+		glBindFramebuffer(GL_FRAMEBUFFER, 0);
+		Shader pointShadowShader("./pointShadow.vs.glsl", "./pointShadow.frag.glsl");
+		pointShadowShader.Use();
+
+		//render the scene as normal
+		glViewport(0, 0, 640, 480);
+		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+		glUniformMatrix4fv(glGetUniformLocation(pointShadowShader.Program, "projection"), 1, GL_FALSE, glm::value_ptr(projection));
+		glUniformMatrix4fv(glGetUniformLocation(pointShadowShader.Program, "view"), 1, GL_FALSE, glm::value_ptr(view));
+		glUniform3f(glGetUniformLocation(pointShadowShader.Program, "lightPos"), pointLightPos[0], pointLightPos[1], pointLightPos[2]);
+		glUniform3f(glGetUniformLocation(pointShadowShader.Program, "viewPos"), cameraPos[0], cameraPos[1], cameraPos[2]);
+		glUniform1f(glGetUniformLocation(pointShadowShader.Program, "far_plane"), 25.0f);
+		glUniform1i(glGetUniformLocation(pointShadowShader.Program, "woodTexture"), 0);
+		glUniform1i(glGetUniformLocation(pointShadowShader.Program, "depthCubeMap"), 1);
+		glActiveTexture(GL_TEXTURE0);
+		glBindTexture(GL_TEXTURE_2D, woodTexture);
+		glActiveTexture(GL_TEXTURE1);
+		glBindTexture(GL_TEXTURE_CUBE_MAP, depthCubeMap);
+		//draw the room
+		glUniformMatrix4fv(glGetUniformLocation(pointShadowShader.Program, "model"), 1, GL_FALSE, glm::value_ptr(roomModel));
+		glUniform1i(glGetUniformLocation(pointShadowShader.Program, "isCube"), 1);
+		glm::vec3 lightCol = vec3(0.8f, 0.9f, 0.3f);
+		glUniform3f(glGetUniformLocation(pointShadowShader.Program, "lightColor"), lightCol[0], lightCol[1], lightCol[2]);
+		glUniform3f(glGetUniformLocation(pointShadowShader.Program, "mtl.ambient"), 0.5f, 0.5f, 0.5f);
+		glUniform3f(glGetUniformLocation(pointShadowShader.Program, "mtl.diffuse"), 1.0f, 1.0f, 1.0f);
+		glUniform3f(glGetUniformLocation(pointShadowShader.Program, "mtl.specular"), 0.5f, 0.5f, 0.5f);
+		glUniform1f(glGetUniformLocation(pointShadowShader.Program, "mtl.shininess"), 50.0f);
+		glBindVertexArray(roomVAO);
+		glDrawArrays(GL_TRIANGLES, 0, 36);
+		glBindVertexArray(0);
+		glUniform1i(glGetUniformLocation(pointShadowShader.Program, "isCube"), 0);
+
+		//draw objects
+		for (int i = 0; i < this->objects.size(); i++)
+		{
+			objects[i].setupMesh();
+			objects[i].drawShadowRoom(pointShadowShader);
+		}
+
+		
 	}
-	glBindFramebuffer(GL_FRAMEBUFFER, 0);
-	Shader pointShadowShader("./pointShadow.vs.glsl", "./pointShadow.frag.glsl");
-	pointShadowShader.Use();
-
-	//render the scene as normal
-	glViewport(0, 0, 640, 480);
-	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-	glUniformMatrix4fv(glGetUniformLocation(pointShadowShader.Program, "projection"), 1, GL_FALSE, glm::value_ptr(projection));
-	glUniformMatrix4fv(glGetUniformLocation(pointShadowShader.Program, "view"), 1, GL_FALSE, glm::value_ptr(view));
-	glUniform3f(glGetUniformLocation(pointShadowShader.Program, "lightPos"), pointLightPos[0], pointLightPos[1], pointLightPos[2]);
-	glUniform3f(glGetUniformLocation(pointShadowShader.Program, "viewPos"), cameraPos[0], cameraPos[1], cameraPos[2]);
-	glUniform1f(glGetUniformLocation(pointShadowShader.Program, "far_plane"), 25.0f);
-	glUniform1i(glGetUniformLocation(pointShadowShader.Program, "woodTexture"), 0);
-	glUniform1i(glGetUniformLocation(pointShadowShader.Program, "depthCubeMap"), 1);
-	glActiveTexture(GL_TEXTURE0);
-	glBindTexture(GL_TEXTURE_2D, woodTexture);
-	glActiveTexture(GL_TEXTURE1);
-	glBindTexture(GL_TEXTURE_CUBE_MAP, depthCubeMap);
-	//draw the room
-	glUniformMatrix4fv(glGetUniformLocation(pointShadowShader.Program, "model"), 1, GL_FALSE, glm::value_ptr(roomModel));
-	glUniform1i(glGetUniformLocation(pointShadowShader.Program, "isCube"), 1);
-	glm::vec3 lightCol = vec3(0.8f, 0.9f, 0.3f);
-	glUniform3f(glGetUniformLocation(pointShadowShader.Program, "lightColor"), lightCol[0], lightCol[1], lightCol[2]);
-	glUniform3f(glGetUniformLocation(pointShadowShader.Program, "mtl.ambient"), 0.5f, 0.5f, 0.5f);
-	glUniform3f(glGetUniformLocation(pointShadowShader.Program, "mtl.diffuse"), 1.0f, 1.0f, 1.0f);
-	glUniform3f(glGetUniformLocation(pointShadowShader.Program, "mtl.specular"), 0.5f, 0.5f, 0.5f);
-	glUniform1f(glGetUniformLocation(pointShadowShader.Program, "mtl.shininess"), 50.0f);
-	glBindVertexArray(roomVAO);
-	glDrawArrays(GL_TRIANGLES, 0, 36);
-	glBindVertexArray(0);
-	glUniform1i(glGetUniformLocation(pointShadowShader.Program, "isCube"), 0);
-
-	//draw objects
-	for (int i = 0; i < this->objects.size(); i++)
-	{
-		objects[i].setupMesh();
-		objects[i].drawShadowRoom(pointShadowShader);
-	}
-
-	
 
 
 
 //--------------------------------------------------------------------------------------
+	if (mode == 3)
+	{
+		Shader pbrShader("./pbr.vs.glsl", "./pbr.frag.glsl");
+		pbrShader.Use();
+		glUniformMatrix4fv(glGetUniformLocation(pbrShader.Program, "view"), 1, GL_FALSE, glm::value_ptr(view));
+		glUniformMatrix4fv(glGetUniformLocation(pbrShader.Program, "projection"), 1, GL_FALSE, glm::value_ptr(projection));
+		glUniform1i(glGetUniformLocation(pbrShader.Program, "albedoMap"), 0);
+		glUniform1i(glGetUniformLocation(pbrShader.Program, "normalMap"), 1);
+		glUniform1i(glGetUniformLocation(pbrShader.Program, "metallicMap"), 2);
+		glUniform1i(glGetUniformLocation(pbrShader.Program, "roughnessMap"), 3);
+		glUniform1i(glGetUniformLocation(pbrShader.Program, "aoMap"), 4);
+		glUniform3f(glGetUniformLocation(pbrShader.Program, "viewPos"), cameraPos[0], cameraPos[1], cameraPos[2]);
+		glActiveTexture(GL_TEXTURE0);
+		glBindTexture(GL_TEXTURE_2D, albedo);
+		glActiveTexture(GL_TEXTURE1);
+		glBindTexture(GL_TEXTURE_2D, normal);
+		glActiveTexture(GL_TEXTURE2);
+		glBindTexture(GL_TEXTURE_2D, metallic);
+		glActiveTexture(GL_TEXTURE3);
+		glBindTexture(GL_TEXTURE_2D, roughness);
+		glActiveTexture(GL_TEXTURE4);
+		glBindTexture(GL_TEXTURE_2D, ao);
 
-	//Shader pbrShader("./pbr.vs.glsl", "./pbr.frag.glsl");
-	//pbrShader.Use();
-	//glUniformMatrix4fv(glGetUniformLocation(pbrShader.Program, "view"), 1, GL_FALSE, glm::value_ptr(view));
-	//glUniformMatrix4fv(glGetUniformLocation(pbrShader.Program, "projection"), 1, GL_FALSE, glm::value_ptr(projection));
-	//glUniform1i(glGetUniformLocation(pbrShader.Program, "albedoMap"), 0);
-	//glUniform1i(glGetUniformLocation(pbrShader.Program, "normalMap"), 1);
-	//glUniform1i(glGetUniformLocation(pbrShader.Program, "metallicMap"), 2);
-	//glUniform1i(glGetUniformLocation(pbrShader.Program, "roughnessMap"), 3);
-	//glUniform1i(glGetUniformLocation(pbrShader.Program, "aoMap"), 4);
-	//glUniform3f(glGetUniformLocation(pbrShader.Program, "viewPos"), cameraPos[0], cameraPos[1], cameraPos[2]);
-	//glActiveTexture(GL_TEXTURE0);
-	//glBindTexture(GL_TEXTURE_2D, albedo);
-	//glActiveTexture(GL_TEXTURE1);
-	//glBindTexture(GL_TEXTURE_2D, normal);
-	//glActiveTexture(GL_TEXTURE2);
-	//glBindTexture(GL_TEXTURE_2D, metallic);
-	//glActiveTexture(GL_TEXTURE3);
-	//glBindTexture(GL_TEXTURE_2D, roughness);
-	//glActiveTexture(GL_TEXTURE4);
-	//glBindTexture(GL_TEXTURE_2D, ao);
+		//set up lights
+		GLfloat positions[12];
+		GLfloat colors[12];
+		glm::vec3 light1Pos = vec3(0.0f, 0.0f, 5.0f);
+		//light1Pos = vec3(view*vec4(light1Pos,0.0f));
+		glm::vec3 light1Col = vec3(0.5f, 0.5, 1.0f);
+		for (int i = 0; i < 3; i++)
+		{  
+			positions[i] = light1Pos[i];
+			colors[i] = light1Col[i];
+		}
 
-	////set up lights
-	//GLfloat positions[12];
-	//GLfloat colors[12];
-	//glm::vec3 light1Pos = vec3(0.0f, 0.0f, 5.0f);
-	////light1Pos = vec3(view*vec4(light1Pos,0.0f));
-	//glm::vec3 light1Col = vec3(0.5f, 0.5, 1.0f);
-	//for (int i = 0; i < 3; i++)
-	//{  
-	//	positions[i] = light1Pos[i];
-	//	colors[i] = light1Col[i];
-	//}
+		vec3 light2Pos = vec3(0.0f, 0.0f, -5.0f);
+		//light2Pos = vec3(view*vec4(light2Pos, 0.0f));
+		vec3 light2Col = vec3(0.5f, 0.5, 1.0f);
+		for (int i = 3; i < 6; i++)
+		{
+			positions[i] = light2Pos[i - 3];
+			colors[i] = light2Col[i - 3];
+		}
 
-	//vec3 light2Pos = vec3(0.0f, 0.0f, -5.0f);
-	////light2Pos = vec3(view*vec4(light2Pos, 0.0f));
-	//vec3 light2Col = vec3(0.5f, 0.5, 1.0f);
-	//for (int i = 3; i < 6; i++)
-	//{
-	//	positions[i] = light2Pos[i - 3];
-	//	colors[i] = light2Col[i - 3];
-	//}
+		vec3 light3Pos = vec3(0.0f, 5.0f, 0.0f);
+		//light2Pos = vec3(view*vec4(light2Pos, 0.0f));
+		vec3 light3Col = vec3(0.5f, 0.5, 1.0f);
+		for (int i = 6; i < 9; i++)
+		{
+			positions[i] = light3Pos[i - 6];
+			colors[i] = light3Col[i - 6];
+		}
 
-	//vec3 light3Pos = vec3(0.0f, 5.0f, 0.0f);
-	////light2Pos = vec3(view*vec4(light2Pos, 0.0f));
-	//vec3 light3Col = vec3(0.5f, 0.5, 1.0f);
-	//for (int i = 6; i < 9; i++)
-	//{
-	//	positions[i] = light3Pos[i - 6];
-	//	colors[i] = light3Col[i - 6];
-	//}
+		vec3 light4Pos = vec3(0.0f, -5.0f, 0.0f);
+		//light2Pos = vec3(view*vec4(light2Pos, 0.0f));
+		vec3 light4Col = vec3(0.5f, 0.5, 1.0f);
+		for (int i = 9; i < 12; i++)
+		{
+			positions[i] = light4Pos[i - 9];
+			colors[i] = light4Col[i - 9];
+		}
 
-	//vec3 light4Pos = vec3(0.0f, -5.0f, 0.0f);
-	////light2Pos = vec3(view*vec4(light2Pos, 0.0f));
-	//vec3 light4Col = vec3(0.5f, 0.5, 1.0f);
-	//for (int i = 9; i < 12; i++)
-	//{
-	//	positions[i] = light4Pos[i - 9];
-	//	colors[i] = light4Col[i - 9];
-	//}
+		glUniform1i(glGetUniformLocation(pbrShader.Program, "numLights"), 4);
+		glUniform3fv(glGetUniformLocation(pbrShader.Program, "lightPos"), 4, positions);
+		glUniform3fv(glGetUniformLocation(pbrShader.Program, "lightColor"), 4, colors);
 
-	//glUniform1i(glGetUniformLocation(pbrShader.Program, "numLights"), 4);
-	//glUniform3fv(glGetUniformLocation(pbrShader.Program, "lightPos"), 4, positions);
-	//glUniform3fv(glGetUniformLocation(pbrShader.Program, "lightColor"), 4, colors);
-
-	//this->object.setupWidthTexCoords();
-	//this->object.drawDepth(pbrShader);
-
+		this->objects[0].setupWidthTexCoords();
+		this->objects[0].drawDepth(pbrShader);
+	}
 //------------------------------------------------------------------------------------------------
-	////render depth of scene to texture
-	//mat4 lightProjection, lightView;
-	//mat4 lightSpaceMatrix;
-	//lightProjection = glm::ortho(-20.0f, 20.0f, -20.0f, 20.0f, -20.0f, 20.0f);
-	//lightView = glm::lookAt(this->lightPos, glm::vec3(0.0f), glm::vec3(0.0, 1.0, 0.0));
-	//lightSpaceMatrix = lightProjection * lightView;
-	//
-	////configure depth shader
-	//Shader depthShader("./depth.vs.glsl", "./depth.frag.glsl");
-	//depthShader.Use();
-	//glUniformMatrix4fv(glGetUniformLocation(depthShader.Program, "lightSpaceMatrix"), 1, GL_FALSE, glm::value_ptr(lightSpaceMatrix));
-	//glViewport(0, 0, 1024, 1024);
-	//glBindFramebuffer(GL_FRAMEBUFFER, depthMapFBO);
-	//glClear(GL_DEPTH_BUFFER_BIT);
-	////glActiveTexture(GL_TEXTURE0);
-	////glBindTexture(GL_TEXTURE_2D, woodTexture);
-	////drawPlane(depthShader, view, projection);
-	//for (int i = 0; i < this->objects.size(); i++)
-	//{
-	//	objects[i].setupMesh();
-	//	objects[i].drawDepth(depthShader);
-	//}
-	//glBindFramebuffer(GL_FRAMEBUFFER, 0);
+	if (mode == 1)
+	{
+		//render depth of scene to texture
+		mat4 lightProjection, lightView;
+		mat4 lightSpaceMatrix;
+		lightProjection = glm::ortho(-20.0f, 20.0f, -20.0f, 20.0f, -20.0f, 20.0f);
+		lightView = glm::lookAt(this->lightPos, glm::vec3(0.0f), glm::vec3(0.0, 1.0, 0.0));
+		lightSpaceMatrix = lightProjection * lightView;
 
-	////render scene as normal using the shadow map
-	////reset viewport
+		//configure depth shader
+		Shader depthShader("./depth.vs.glsl", "./depth.frag.glsl");
+		depthShader.Use();
+		glUniformMatrix4fv(glGetUniformLocation(depthShader.Program, "lightSpaceMatrix"), 1, GL_FALSE, glm::value_ptr(lightSpaceMatrix));
+		glViewport(0, 0, 1024, 1024);
+		glBindFramebuffer(GL_FRAMEBUFFER, depthMapFBO);
+		glClear(GL_DEPTH_BUFFER_BIT);
+		//glActiveTexture(GL_TEXTURE0);
+		//glBindTexture(GL_TEXTURE_2D, woodTexture);
+		//drawPlane(depthShader, view, projection);
+		for (int i = 0; i < this->objects.size(); i++)
+		{
+			objects[i].setupMesh();
+			objects[i].drawDepth(depthShader);
+		}
+		glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
-	//glViewport(0, 0, 640, 480);
-	//glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-	//glm::mat4 biasMatrix(
-	//	0.5, 0.0, 0.0, 0.0,
-	//	0.0, 0.5, 0.0, 0.0,
-	//	0.0, 0.0, 0.5, 0.0,
-	//	0.5, 0.5, 0.5, 1.0
-	//	);
-	//
-	//glm::mat4 depthBiasMatrix = biasMatrix*lightSpaceMatrix;
+		//render scene as normal using the shadow map
+		//reset viewport
 
-	////set up shadow shader
-	//
-	//Shader shadowShader("./shadow.vs.glsl", "./shadow.frag.glsl");
+		glViewport(0, 0, 640, 480);
+		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+		glm::mat4 biasMatrix(
+			0.5, 0.0, 0.0, 0.0,
+			0.0, 0.5, 0.0, 0.0,
+			0.0, 0.0, 0.5, 0.0,
+			0.5, 0.5, 0.5, 1.0
+		);
 
-	//shadowShader.Use();
-	//glUniform1i(glGetUniformLocation(shadowShader.Program, "wood"), 0);
-	//glUniform1i(glGetUniformLocation(shadowShader.Program, "shadowMap"), 1);
-	//glUniform1i(glGetUniformLocation(shadowShader.Program, "skybox"),2);
-	//glUniformMatrix4fv(glGetUniformLocation(shadowShader.Program, "depthBiasMatrix"),1, GL_FALSE, glm::value_ptr(depthBiasMatrix));
-	//glUniform3f(glGetUniformLocation(shadowShader.Program, "viewPos"),cameraPos[0], cameraPos[1], cameraPos[2]);
-	//glActiveTexture(GL_TEXTURE0);
-	//glBindTexture(GL_TEXTURE_2D, woodTexture);
-	//glActiveTexture(GL_TEXTURE1);
-	//glBindTexture(GL_TEXTURE_2D, depthMap);
+		glm::mat4 depthBiasMatrix = biasMatrix*lightSpaceMatrix;
 
-	//glBindVertexArray(skyboxVAO);
-	//glActiveTexture(GL_TEXTURE2);
-	//glBindTexture(GL_TEXTURE_CUBE_MAP, this->cubemapTexture);
-	//glDrawArrays(GL_TRIANGLES, 0, 36);
-	//glBindVertexArray(0);
-	//this->renderScene(shadowShader, view, projection);
+		//set up shadow shader
 
-	//////render the skybox at last
-	//Shader skyboxShader("./skybox.vs.glsl", "./skybox.frag.glsl");
-	//glDepthFunc(GL_LEQUAL);
-	//skyboxShader.Use();
-	//glUniformMatrix4fv(glGetUniformLocation(skyboxShader.Program, "projection"), 1, GL_FALSE, glm::value_ptr(projection));
-	//glUniformMatrix4fv(glGetUniformLocation(skyboxShader.Program, "modelview"), 1, GL_FALSE, glm::value_ptr(view));
-	//glUniform1i(glGetUniformLocation(skyboxShader.Program,"skybox"),0);
-	//glBindVertexArray(skyboxVAO);
-	//glActiveTexture(GL_TEXTURE0);
-	//glBindTexture(GL_TEXTURE_CUBE_MAP, this->cubemapTexture);
-	//glDrawArrays(GL_TRIANGLES, 0, 36);
-	//glBindVertexArray(0);
-	//glDepthFunc(GL_LESS); // set depth function back to default
+		Shader shadowShader("./shadow.vs.glsl", "./shadow.frag.glsl");
 
+		shadowShader.Use();
+		glUniform1i(glGetUniformLocation(shadowShader.Program, "wood"), 0);
+		glUniform1i(glGetUniformLocation(shadowShader.Program, "shadowMap"), 1);
+		glUniform1i(glGetUniformLocation(shadowShader.Program, "skybox"), 2);
+		glUniformMatrix4fv(glGetUniformLocation(shadowShader.Program, "depthBiasMatrix"), 1, GL_FALSE, glm::value_ptr(depthBiasMatrix));
+		glUniform3f(glGetUniformLocation(shadowShader.Program, "viewPos"), cameraPos[0], cameraPos[1], cameraPos[2]);
+		glActiveTexture(GL_TEXTURE0);
+		glBindTexture(GL_TEXTURE_2D, woodTexture);
+		glActiveTexture(GL_TEXTURE1);
+		glBindTexture(GL_TEXTURE_2D, depthMap);
+
+		glBindVertexArray(skyboxVAO);
+		glActiveTexture(GL_TEXTURE2);
+		glBindTexture(GL_TEXTURE_CUBE_MAP, this->cubemapTexture);
+		glDrawArrays(GL_TRIANGLES, 0, 36);
+		glBindVertexArray(0);
+		this->renderScene(shadowShader, view, projection);
+
+		//////render the skybox at last
+		glViewport(0, 0, 640, 480);
+		Shader skyboxShader("./skybox.vs.glsl", "./skybox.frag.glsl");
+		glDepthFunc(GL_LEQUAL);
+		skyboxShader.Use();
+		glUniformMatrix4fv(glGetUniformLocation(skyboxShader.Program, "projection"), 1, GL_FALSE, glm::value_ptr(projection));
+		glUniformMatrix4fv(glGetUniformLocation(skyboxShader.Program, "modelview"), 1, GL_FALSE, glm::value_ptr(view));
+		glUniform1i(glGetUniformLocation(skyboxShader.Program, "skybox"), 0);
+		glBindVertexArray(skyboxVAO);
+		glActiveTexture(GL_TEXTURE0);
+		glBindTexture(GL_TEXTURE_CUBE_MAP, this->cubemapTexture);
+		glDrawArrays(GL_TRIANGLES, 0, 36);
+		glBindVertexArray(0);
+		glDepthFunc(GL_LESS); // set depth function back to default
+	}
 }
 
 void Scene::drawPlane(Shader & shader, const mat4 view, const mat4 projection)

@@ -20,11 +20,11 @@ int main(int argc, char* argv[])
 {
 	if (argc < 2)
 	{
-		cerr << "Please add a filename and/or step size" << endl;
+		cerr << "Please add a render mode" << endl;
 		exit(-1);
 	}
 
-
+	int renderMode = stoi(argv[1]);
 	glfwInit();
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
@@ -64,9 +64,9 @@ int main(int argc, char* argv[])
 		sprintf_s(buff, "Finsh Loading/n");
 		OutputDebugString(buff);
 	}
-	Scene myScene = Scene(argv[1]);
+	Scene myScene = Scene();
 	myScene.cameraPos = eye;
-	myScene.setupScene();
+	myScene.setupScene(renderMode);
 	myScene.lightPos = vec3(-2.0f, 10.0f, -1.0f);
 	float rotation = 1.0f;
 	float tx = 0;
@@ -151,7 +151,7 @@ int main(int argc, char* argv[])
 		view = glm::lookAt(eye, center, up);
 		view = glm::translate(view, vec3(tx, ty, tz));
 		view = glm::scale(view, vec3(sc, sc, sc));
-		myScene.render(projection, view);
+		myScene.render(projection, view,renderMode);
 		glfwSwapBuffers(window);
 	} while (glfwGetKey(window, GLFW_KEY_ESCAPE) != GLFW_PRESS && !glfwWindowShouldClose(window));
 	glfwTerminate();

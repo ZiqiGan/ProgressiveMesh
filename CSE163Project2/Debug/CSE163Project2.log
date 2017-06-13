@@ -1,6 +1,8 @@
-﻿  Scene.cpp
-c:\users\chunc\desktop\coursework\cse\cse163\assignment3\cse163hw2\cse163project2\scene.cpp(183): warning C4018: '<': signed/unsigned mismatch
-c:\users\chunc\desktop\coursework\cse\cse163\assignment3\cse163hw2\cse163project2\scene.cpp(221): warning C4018: '<': signed/unsigned mismatch
-c:\users\chunc\desktop\coursework\cse\cse163\assignment3\cse163hw2\cse163project2\scene.cpp(422): warning C4018: '<': signed/unsigned mismatch
-  CSE163Project2.vcxproj -> C:\Users\chunc\Desktop\Coursework\CSE\CSE163\Assignment3\CSE163HW2\Debug\CSE163Project2.exe
-  CSE163Project2.vcxproj -> C:\Users\chunc\Desktop\Coursework\CSE\CSE163\Assignment3\CSE163HW2\Debug\CSE163Project2.pdb (Partial PDB)
+﻿C:\Program Files (x86)\MSBuild\Microsoft.Cpp\v4.0\V140\Microsoft.CppBuild.targets(392,5): warning MSB8028: The intermediate directory (Debug\) contains files shared from another project (~AutoRecover.CSE163Project2.vcxproj).  This can lead to incorrect clean and rebuild behavior.
+  Scene.cpp
+c:\users\zigan\desktop\cse163hw2\cse163project2\scene.cpp(247): warning C4018: '<': signed/unsigned mismatch
+c:\users\zigan\desktop\cse163hw2\cse163project2\scene.cpp(285): warning C4018: '<': signed/unsigned mismatch
+c:\users\zigan\desktop\cse163hw2\cse163project2\scene.cpp(386): warning C4018: '<': signed/unsigned mismatch
+c:\users\zigan\desktop\cse163hw2\cse163project2\scene.cpp(491): warning C4018: '<': signed/unsigned mismatch
+  CSE163Project2.vcxproj -> C:\Users\zigan\Desktop\CSE163HW2\Debug\CSE163Project2.exe
+  CSE163Project2.vcxproj -> C:\Users\zigan\Desktop\CSE163HW2\Debug\CSE163Project2.pdb (Partial PDB)

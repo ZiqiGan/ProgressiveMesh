@@ -1,0 +1,11 @@
+﻿C:\Program Files (x86)\MSBuild\Microsoft.Cpp\v4.0\V140\Microsoft.CppBuild.targets(392,5): warning MSB8028: The intermediate directory (Debug\) contains files shared from another project (CSE163Project2.vcxproj).  This can lead to incorrect clean and rebuild behavior.
+  Scene.cpp
+c:\users\zigan\desktop\cse163hw2\cse163project2\scene.cpp(506): warning C4018: '<': signed/unsigned mismatch
+  Generating Code...
+  Skipping... (no relevant changes detected)
+  Transform.cpp
+  Shader.cpp
+  Mesh.cpp
+  main.cpp
+  ~AutoRecover.CSE163Project2.vcxproj -> C:\Users\zigan\Desktop\CSE163HW2\CSE163Project2\Debug\~AutoRecover.CSE163Project2.exe
+  ~AutoRecover.CSE163Project2.vcxproj -> C:\Users\zigan\Desktop\CSE163HW2\CSE163Project2\Debug\~AutoRecover.CSE163Project2.pdb (Partial PDB)
