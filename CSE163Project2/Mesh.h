@@ -87,6 +87,7 @@ public:
 	void drawDepth(Shader & shader);
 	void drawShadowRoom(const Shader& shader);
 	void Draw(Shader& shader, mat4 view,mat4 projection);
+	void DrawShadow(Shader & shader, mat4 view, mat4 projection, vec4 lightPos);
 	glm::mat4 model = mat4(1.0f);
 
 private:

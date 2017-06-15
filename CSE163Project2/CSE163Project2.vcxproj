@@ -115,6 +115,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <None Include="basicShadow.frag.glsl" />
     <None Include="cubeMap.vs.glsl" />
     <None Include="debug.frag.glsl" />
     <None Include="debug.vs.glsl" />

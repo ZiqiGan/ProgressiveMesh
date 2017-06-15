@@ -78,7 +78,7 @@ void main()
 	vec3 phong = visibility*mtl.specular*lightColor*pow(max(nDotH,0.0),mtl.shininess);
 
 	finalColor +=phong;
-	finalColor = (mtl.ambient+finalColor)*texColor;
+	finalColor = (mtl.ambient+finalColor);
 	//fragColor = vec4(finalColor,1.0f);
 	//fragColor = vec4(finalColor,1.0f);
 	//fragColor = vec4(texture(depthCubeMap,FragPos-lightPos).rgb,1.0f);

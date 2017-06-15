@@ -17,20 +17,28 @@ void Scene::setupScene(int mode)
 		object1.readFile("./models/teapot.off");
 		object1.mtl.ambient = vec3(0.2f, 0.2f, 0.7f);
 		object1.mtl.diffuse = vec3(1.0f, 1.0f, 1.0f);
-		object1.mtl.specular = vec3(1.0f, 1.0f, 1.0f);
-		//object1.model = glm::translate(object.model, vec3(0.0f, 0.0f, -20.0f));
+		object1.mtl.specular = vec3(0.7f, 0.7f, 0.7f);
+		object1.mtl.shininess = 50.0f;
 		this->objects.push_back(object1);
 
 
 		Mesh object2;
-		object2.readFile("./models/sphere.off");
-		//object2.model = glm::translate(object2.model, vec3(-15.0f, 15.0f, -15.0f));
-		object2.model = glm::translate(object2.model, vec3(-8.0f, 1.2f, 0.0f));
-		//object2.model = glm::scale(object2.model, vec3(4.0f, 4.0f, 4.0f));
+		object2.readFile("./models/teapot.off");
+		object2.model = glm::translate(object2.model, vec3(-4.0f, 1.2f, 5.0f));
 		object2.mtl.ambient = vec3(0.2f, 0.6f, 0.1f);
 		object2.mtl.diffuse = vec3(1.0f, 1.0f, 1.0f);
-		object2.mtl.specular = vec3(1.0f, 1.0f, 1.0f);
+		object2.mtl.specular = vec3(0.7f, 0.7f, 0.7f);
+		object2.mtl.shininess = 50.0f;
 		this->objects.push_back(object2);
+
+		Mesh object3;
+		object3.readFile("./models/cow.off");
+		object3.model = glm::translate(object3.model, vec3(-6.0f, 3.0f, 0.0f));
+		object3.mtl.ambient = vec3(0.4f, 0.3f, 0.1f);
+		object3.mtl.diffuse = vec3(1.0f, 1.0f, 1.0f);
+		object3.mtl.specular = vec3(0.5f, 0.5f, 0.5f);
+		object3.mtl.shininess = 50.0f;
+		this->objects.push_back(object3);
 
 		setupFrameBuffer();
 		setupPlane();
@@ -61,7 +69,7 @@ void Scene::setupScene(int mode)
 		object3.readFile("./models/cow.off");
 		//object3.model = glm::translate(object3.model, vec3(20.0f, -1.2f, 0));
 		//object3.model = glm::scale(object3.model, vec3(0.3f, 0.3f, 0.3f));
-		object3.model = glm::translate(object3.model, vec3(12.0f, -1.2f, 0));
+		object3.model = glm::translate(object3.model, vec3(12.0f, 0.0f, 0));
 		object3.model = glm::scale(object3.model, vec3(0.3f, 0.3f, 0.3f));
 		object3.mtl.ambient = vec3(0.6f, 0.2f, 0.1f);
 		object3.mtl.diffuse = vec3(1.0f, 1.0f, 1.0f);
@@ -69,6 +77,7 @@ void Scene::setupScene(int mode)
 		this->objects.push_back(object3);
 
 		setupFrameBuffer();
+		setupPlane();
 		this->cubemapTexture = loadCubemap(this->cubeFaces);
 		//setup skybox
 		glGenVertexArrays(1, &skyboxVAO);
@@ -82,6 +91,7 @@ void Scene::setupScene(int mode)
 		glBindBuffer(GL_ARRAY_BUFFER, 0);
 		glBindVertexArray(0);
 	}
+	//point-light shadow room
 	else if (mode == 2)
 	{
 		Mesh object1;
@@ -112,6 +122,7 @@ void Scene::setupScene(int mode)
 		object3.mtl.diffuse = vec3(1.0f, 1.0f, 1.0f);
 		object3.mtl.specular = vec3(1.0f, 1.0f, 1.0f);
 		this->objects.push_back(object3);
+	
 
 		setupPointDepthFrameBuffer();
 		setupRoom();
@@ -128,6 +139,7 @@ void Scene::setupScene(int mode)
 		glBindBuffer(GL_ARRAY_BUFFER, 0);
 		glBindVertexArray(0);
 	}
+	//pbr
 	else if (mode == 3)
 	{
 		Mesh object1;
@@ -146,7 +158,6 @@ void Scene::setupScene(int mode)
 		this->ao = loadTexture("./models/holey-rock1-ue/ao.png");
 	}
 	
-
 }
 
 
@@ -392,7 +403,7 @@ void Scene::render( const mat4 & projection, const mat4 & view,int mode)
 		mat4 lightProjection, lightView;
 		mat4 lightSpaceMatrix;
 		lightProjection = glm::ortho(-20.0f, 20.0f, -20.0f, 20.0f, -20.0f, 20.0f);
-		lightView = glm::lookAt(this->lightPos, glm::vec3(0.0f), glm::vec3(0.0, 1.0, 0.0));
+		lightView = glm::lookAt(glm::vec3(this->lightPos), glm::vec3(0.0f), glm::vec3(0.0, 1.0, 0.0));
 		lightSpaceMatrix = lightProjection * lightView;
 
 		//configure depth shader
@@ -463,6 +474,65 @@ void Scene::render( const mat4 & projection, const mat4 & view,int mode)
 		glBindVertexArray(0);
 		glDepthFunc(GL_LESS); // set depth function back to default
 	}
+
+	if (mode == 0)
+	{
+		glClearColor(0.6, 0.6, 0.6,1.0f);
+		//render depth of scene to texture
+		mat4 lightProjection, lightView;
+		mat4 lightSpaceMatrix;
+		lightProjection = glm::ortho(-50.0f, 50.0f, -50.0f, 50.0f, -50.0f, 50.0f);
+		lightView = glm::lookAt(glm::vec3(this->lightPos), glm::vec3(0.0f), glm::vec3(0.0, 1.0, 0.0));
+		lightSpaceMatrix = lightProjection * lightView;
+
+		//configure depth shader
+		Shader depthShader("./depth.vs.glsl", "./depth.frag.glsl");
+		depthShader.Use();
+		glUniformMatrix4fv(glGetUniformLocation(depthShader.Program, "lightSpaceMatrix"), 1, GL_FALSE, glm::value_ptr(lightSpaceMatrix));
+		glViewport(0, 0, 1024, 1024);
+		glBindFramebuffer(GL_FRAMEBUFFER, depthMapFBO);
+		glClear(GL_DEPTH_BUFFER_BIT);
+		drawPlane(depthShader, view, projection);
+		for (int i = 0; i < this->objects.size(); i++)
+		{
+			objects[i].setupMesh();
+			objects[i].drawDepth(depthShader);
+		}
+		glBindFramebuffer(GL_FRAMEBUFFER, 0);
+
+		//render scene as normal using the shadow map
+		//reset viewport
+
+		glViewport(0, 0, 640, 480);
+		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+		glm::mat4 biasMatrix(
+			0.5, 0.0, 0.0, 0.0,
+			0.0, 0.5, 0.0, 0.0,
+			0.0, 0.0, 0.5, 0.0,
+			0.5, 0.5, 0.5, 1.0
+			);
+
+		glm::mat4 depthBiasMatrix = biasMatrix*lightSpaceMatrix;
+
+		//set up shadow shader
+
+		Shader shadowShader("./shadow.vs.glsl", "./basicShadow.frag.glsl");
+
+		shadowShader.Use();
+		glUniform1i(glGetUniformLocation(shadowShader.Program, "shadowMap"), 0);
+		glUniformMatrix4fv(glGetUniformLocation(shadowShader.Program, "depthBiasMatrix"), 1, GL_FALSE, glm::value_ptr(depthBiasMatrix));
+		glUniform3f(glGetUniformLocation(shadowShader.Program, "viewPos"), cameraPos[0], cameraPos[1], cameraPos[2]);
+		glActiveTexture(GL_TEXTURE0);
+		glBindTexture(GL_TEXTURE_2D, depthMap);
+
+		glBindVertexArray(skyboxVAO);
+		glActiveTexture(GL_TEXTURE2);
+		glBindTexture(GL_TEXTURE_CUBE_MAP, this->cubemapTexture);
+		glDrawArrays(GL_TRIANGLES, 0, 36);
+		glBindVertexArray(0);
+		this->renderShadowScene(shadowShader, view, projection);
+
+	}
 }
 
 void Scene::drawPlane(Shader & shader, const mat4 view, const mat4 projection)
@@ -475,45 +545,90 @@ void Scene::drawPlane(Shader & shader, const mat4 view, const mat4 projection)
 void Scene::renderScene(Shader & shader,const mat4 view, const mat4 projection)
 {
 
-	////draw plane
-	//glm::mat4 planeModel;
-	//glm::mat4 modelview = view*planeModel;
-	//glUniformMatrix4fv(glGetUniformLocation(shader.Program, "model"), 1, GL_FALSE, glm::value_ptr(planeModel));
-	//glUniformMatrix4fv(glGetUniformLocation(shader.Program, "view"), 1, GL_FALSE, glm::value_ptr(view));
-	//glUniformMatrix4fv(glGetUniformLocation(shader.Program, "modelview"), 1, GL_FALSE, glm::value_ptr(modelview));
-	//glUniformMatrix4fv(glGetUniformLocation(shader.Program, "projection"), 1, GL_FALSE, glm::value_ptr(projection));
+	//draw plane
+	glm::mat4 planeModel;
+	glm::mat4 modelview = view*planeModel;
+	glUniformMatrix4fv(glGetUniformLocation(shader.Program, "model"), 1, GL_FALSE, glm::value_ptr(planeModel));
+	glUniformMatrix4fv(glGetUniformLocation(shader.Program, "view"), 1, GL_FALSE, glm::value_ptr(view));
+	glUniformMatrix4fv(glGetUniformLocation(shader.Program, "modelview"), 1, GL_FALSE, glm::value_ptr(modelview));
+	glUniformMatrix4fv(glGetUniformLocation(shader.Program, "projection"), 1, GL_FALSE, glm::value_ptr(projection));
 
 
-	////set up material properties
-	//glUniform4f(glGetUniformLocation(shader.Program, "mtl.ambient"), 0.5f, 0.5f, 0.5f, 1.0f);
-	//glUniform4f(glGetUniformLocation(shader.Program, "mtl.diffuse"), 0.5f, 0.5f, 0.5f, 1.0f);
-	//glUniform4f(glGetUniformLocation(shader.Program, "mtl.specular"), 1.0f, 1.0f, 1.0f, 1.0f);
-	//glUniform1f(glGetUniformLocation(shader.Program, "mtl.shininess"), 50.0f);
+	//set up material properties
+	glUniform4f(glGetUniformLocation(shader.Program, "mtl.ambient"), 0.5f, 0.5f, 0.5f, 1.0f);
+	glUniform4f(glGetUniformLocation(shader.Program, "mtl.diffuse"), 0.5f, 0.5f, 0.5f, 1.0f);
+	glUniform4f(glGetUniformLocation(shader.Program, "mtl.specular"), 1.0f, 1.0f, 1.0f, 1.0f);
+	glUniform1f(glGetUniformLocation(shader.Program, "mtl.shininess"), 50.0f);
 
-	////set up lights
-	//GLfloat positions[8];
-	//GLfloat colors[8];
-	//glm::vec4 lightPos = vec4(-2.0f, 2.0f, -1.0f,0.0f);
-	//lightPos = view*lightPos;
-	//glm::vec4 light1Col = vec4(0.5f, 0.5f, 1.0f, 1.0f);
-	//for (int i = 0; i < 4; i++)
-	//{
-	//	positions[i] = lightPos[i];
-	//	colors[i] = light1Col[i];
-	//}
-	//glUniform1i(glGetUniformLocation(shader.Program, "numLight"), 1);
-	//glUniform4fv(glGetUniformLocation(shader.Program, "lightPos"), 1, positions);
-	//glUniform4fv(glGetUniformLocation(shader.Program, "lightColor"), 1, colors);
+	//set up lights
+	GLfloat positions[4];
+	GLfloat colors[4];
+	glm::vec4 lightPos = vec4(-2.0f, 2.0f, -1.0f,0.0f);
+	lightPos = view*lightPos;
+	glm::vec4 light1Col = vec4(0.5f, 0.5f, 1.0f, 1.0f);
+	for (int i = 0; i < 4; i++)
+	{
+		positions[i] = lightPos[i];
+		colors[i] = light1Col[i];
+	}
+	glUniform1i(glGetUniformLocation(shader.Program, "numLight"), 1);
+	glUniform4fv(glGetUniformLocation(shader.Program, "lightPos"), 1, positions);
+	glUniform4fv(glGetUniformLocation(shader.Program, "lightColor"), 1, colors);
 
-	//glBindVertexArray(this->planeVAO);
-	//glDrawArrays(GL_TRIANGLES,0,6);
-	//glBindVertexArray(0);
+	glBindVertexArray(this->planeVAO);
+	glDrawArrays(GL_TRIANGLES,0,6);
+	glBindVertexArray(0);
 
 	//draw the objects
 	for (int i = 0; i < this->objects.size(); i++)
 	{
 		objects[i].setupMesh();
 		objects[i].Draw(shader, view, projection);
+	}
+}
+
+void Scene::renderShadowScene(Shader & shader, const mat4 view, const mat4 projection)
+{
+
+	//draw plane
+	glm::mat4 planeModel;
+	glm::mat4 modelview = view*planeModel;
+	glUniformMatrix4fv(glGetUniformLocation(shader.Program, "model"), 1, GL_FALSE, glm::value_ptr(planeModel));
+	glUniformMatrix4fv(glGetUniformLocation(shader.Program, "view"), 1, GL_FALSE, glm::value_ptr(view));
+	glUniformMatrix4fv(glGetUniformLocation(shader.Program, "modelview"), 1, GL_FALSE, glm::value_ptr(modelview));
+	glUniformMatrix4fv(glGetUniformLocation(shader.Program, "projection"), 1, GL_FALSE, glm::value_ptr(projection));
+
+
+	//set up material properties
+	glUniform4f(glGetUniformLocation(shader.Program, "mtl.ambient"), 0.5f, 0.5f, 0.5f, 1.0f);
+	glUniform4f(glGetUniformLocation(shader.Program, "mtl.diffuse"), 0.5f, 0.5f, 0.5f, 1.0f);
+	glUniform4f(glGetUniformLocation(shader.Program, "mtl.specular"), 1.0f, 1.0f, 1.0f, 1.0f);
+	glUniform1f(glGetUniformLocation(shader.Program, "mtl.shininess"), 50.0f);
+
+	//set up lights
+	GLfloat positions[4];
+	GLfloat colors[4];
+	glm::vec4 lightPos = vec4(-2.0f, 2.0f, -1.0f, 0.0f);
+	lightPos = view*lightPos;
+	glm::vec4 light1Col = vec4(0.5f, 0.5f, 1.0f, 1.0f);
+	for (int i = 0; i < 4; i++)
+	{
+		positions[i] = lightPos[i];
+		colors[i] = light1Col[i];
+	}
+	glUniform1i(glGetUniformLocation(shader.Program, "numLight"), 1);
+	glUniform4fv(glGetUniformLocation(shader.Program, "lightPos"), 1, positions);
+	glUniform4fv(glGetUniformLocation(shader.Program, "lightColor"), 1, colors);
+
+	glBindVertexArray(this->planeVAO);
+	glDrawArrays(GL_TRIANGLES, 0, 6);
+	glBindVertexArray(0);
+
+	//draw the objects
+	for (int i = 0; i < this->objects.size(); i++)
+	{
+		objects[i].setupMesh();
+		objects[i].DrawShadow(shader, view, projection,this->lightPos);
 	}
 }
 

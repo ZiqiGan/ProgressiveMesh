@@ -20,6 +20,7 @@ public:
 	void render(const mat4 & projection, const mat4 & modelview,int mode);
 	void drawPlane(Shader & shader, const mat4 view, const mat4 projection);
 	void renderScene( Shader & shader,const mat4 view, const mat4 projection);
+	void renderShadowScene(Shader & shader, const mat4 view, const mat4 projection);
 	unsigned int loadCubemap(vector<std::string> faces);
 	vector<std::string> cubeFaces
 	{
@@ -34,7 +35,7 @@ public:
 
 
 	vec3 cameraPos;
-	vec3 lightPos = vec4(-2.0f, 2.0f, -1.0f, 0.0f);
+	vec4 lightPos = vec4(-2.0f, 5.0f, -1.0f, 0.0f);
 	vec3 pointLightPos = vec3(0.0f, 10.0f, 0.0f);
 	GLuint skyboxVAO, skyboxVBO, skyboxEBO;
 	GLuint depthMapFBO, depthMap;

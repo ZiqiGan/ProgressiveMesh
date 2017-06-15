@@ -20,7 +20,7 @@ void main()
 {
 	TexCoords = texCoords;
 	cubeCoords = position;
-	shadowCoords = depthBiasMatrix*vec4(position,1.0f);
+	shadowCoords = depthBiasMatrix*model*vec4(position,1.0f);
     gl_Position = projection*view*model*vec4(position, 1.0f);
 	reflectNormal = mat3(transpose(inverse(model)))*normal;
 	mynormal = normal;

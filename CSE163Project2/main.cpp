@@ -67,7 +67,7 @@ int main(int argc, char* argv[])
 	Scene myScene = Scene();
 	myScene.cameraPos = eye;
 	myScene.setupScene(renderMode);
-	myScene.lightPos = vec3(-2.0f, 10.0f, -1.0f);
+	//myScene.lightPos = vec3(-2.0f, 10.0f, -1.0f);
 	float rotation = 1.0f;
 	float tx = 0;
 	float ty = 0;
@@ -137,11 +137,26 @@ int main(int argc, char* argv[])
 		}
 		else if (glfwGetKey(window, GLFW_KEY_L) == GLFW_PRESS)
 		{
-			myScene.pointLightPos.z += 0.1f;
+			if (renderMode == 2)
+			{
+				myScene.pointLightPos.z += 0.1f;
+			}
+			else if (renderMode == 0)
+			{
+				myScene.lightPos.x += 0.1f;
+			}
 		}
 		else if (glfwGetKey(window, GLFW_KEY_K) == GLFW_PRESS)
 		{
-			myScene.pointLightPos.z -= 0.1f;
+			if (renderMode == 2)
+			{
+				myScene.pointLightPos.z -= 0.1f;
+			}
+			else if (renderMode == 0)
+			{
+				myScene.lightPos.x -= 0.1f;
+			}
+
 		}
 		else if (glfwGetKey(window, GLFW_KEY_H) == GLFW_PRESS)
 		{

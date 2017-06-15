@@ -1,23 +1,4 @@
-﻿  main.cpp
-c:\users\chunc\desktop\coursework\cse\cse163\assignment2\cse163hw2\cse163project2\Transform.h(14): warning C4305: 'initializing': truncation from 'double' to 'float'
-C:\Program Files (x86)\Windows Kits\8.1\Include\shared\minwindef.h(130): warning C4005: 'APIENTRY': macro redefinition
-  C:\Users\chunc\Desktop\Coursework\CSE\CSE163\Assignment2\CSE163HW2\packages\glfw.3.2.1\build\native\include\GLFW/glfw3.h(98): note: see previous definition of 'APIENTRY'
-main.cpp(70): warning C4305: 'argument': truncation from 'double' to 'GLclampf'
-  Mesh.cpp
-Mesh.cpp(384): warning C4018: '<': signed/unsigned mismatch
-Mesh.cpp(408): warning C4018: '<': signed/unsigned mismatch
-Mesh.cpp(439): warning C4018: '<': signed/unsigned mismatch
-Mesh.cpp(448): warning C4018: '<': signed/unsigned mismatch
-Mesh.cpp(474): warning C4018: '<': signed/unsigned mismatch
-Mesh.cpp(508): warning C4018: '<': signed/unsigned mismatch
-Mesh.cpp(552): warning C4018: '<': signed/unsigned mismatch
-Mesh.cpp(583): warning C4018: '<': signed/unsigned mismatch
-  Scene.cpp
-  Shader.cpp
-  Transform.cpp
-c:\users\chunc\desktop\coursework\cse\cse163\assignment2\cse163hw2\cse163project2\Transform.h(14): warning C4305: 'initializing': truncation from 'double' to 'float'
-Transform.cpp(7): warning C4244: 'initializing': conversion from 'double' to 'float', possible loss of data
-main.obj : error LNK2001: unresolved external symbol __imp__glViewport@16
+﻿main.obj : error LNK2001: unresolved external symbol __imp__glViewport@16
 main.obj : error LNK2001: unresolved external symbol __imp__glClear@4
 main.obj : error LNK2001: unresolved external symbol __imp__glEnable@4
 main.obj : error LNK2001: unresolved external symbol __imp__glClearColor@16
@@ -27,16 +8,33 @@ Mesh.obj : error LNK2001: unresolved external symbol __imp____glewEnableVertexAt
 Mesh.obj : error LNK2001: unresolved external symbol __imp____glewBindVertexArray
 Mesh.obj : error LNK2001: unresolved external symbol __imp____glewVertexAttribPointer
 Mesh.obj : error LNK2001: unresolved external symbol __imp____glewBindBuffer
+Mesh.obj : error LNK2001: unresolved external symbol __imp____glewUniform1i
 Mesh.obj : error LNK2001: unresolved external symbol __imp____glewUniform1f
 Mesh.obj : error LNK2001: unresolved external symbol __imp____glewGetUniformLocation
 Mesh.obj : error LNK2001: unresolved external symbol __imp____glewBufferData
 Mesh.obj : error LNK2001: unresolved external symbol __imp____glewGenVertexArrays
+Mesh.obj : error LNK2001: unresolved external symbol __imp____glewUniformMatrix4fv
 Mesh.obj : error LNK2001: unresolved external symbol __imp__glDrawElements@16
 Mesh.obj : error LNK2001: unresolved external symbol __imp____glewGenBuffers
 Mesh.obj : error LNK2001: unresolved external symbol __imp____glewUniform3f
-Mesh.obj : error LNK2001: unresolved external symbol __imp____glewUniform1d
+Mesh.obj : error LNK2001: unresolved external symbol __imp____glewUniform4fv
+Mesh.obj : error LNK2001: unresolved external symbol __imp____glewUniform4f
 Scene.obj : error LNK2001: unresolved external symbol __imp____glewUseProgram
-Scene.obj : error LNK2001: unresolved external symbol __imp____glewUniformMatrix4fv
+Scene.obj : error LNK2001: unresolved external symbol __imp__glBindTexture@8
+Scene.obj : error LNK2001: unresolved external symbol __imp__glGenTextures@8
+Scene.obj : error LNK2001: unresolved external symbol __imp____glewFramebufferTexture
+Scene.obj : error LNK2001: unresolved external symbol __imp__glTexParameteri@12
+Scene.obj : error LNK2001: unresolved external symbol __imp____glewActiveTexture
+Scene.obj : error LNK2001: unresolved external symbol __imp__glReadBuffer@4
+Scene.obj : error LNK2001: unresolved external symbol __imp____glewFramebufferTexture2D
+Scene.obj : error LNK2001: unresolved external symbol __imp____glewGenFramebuffers
+Scene.obj : error LNK2001: unresolved external symbol __imp__glDrawArrays@12
+Scene.obj : error LNK2001: unresolved external symbol __imp____glewBindFramebuffer
+Scene.obj : error LNK2001: unresolved external symbol __imp__glTexImage2D@36
+Scene.obj : error LNK2001: unresolved external symbol __imp____glewGenerateMipmap
+Scene.obj : error LNK2001: unresolved external symbol __imp__glDepthFunc@4
+Scene.obj : error LNK2001: unresolved external symbol __imp__glDrawBuffer@4
+Scene.obj : error LNK2001: unresolved external symbol __imp____glewUniform3fv
 Shader.obj : error LNK2001: unresolved external symbol __imp____glewGetShaderiv
 Shader.obj : error LNK2001: unresolved external symbol __imp____glewCompileShader
 Shader.obj : error LNK2001: unresolved external symbol __imp____glewCreateShader
@@ -48,4 +46,4 @@ Shader.obj : error LNK2001: unresolved external symbol __imp____glewShaderSource
 Shader.obj : error LNK2001: unresolved external symbol __imp____glewGetProgramInfoLog
 Shader.obj : error LNK2001: unresolved external symbol __imp____glewDeleteShader
 Shader.obj : error LNK2001: unresolved external symbol __imp____glewLinkProgram
-C:\Users\chunc\Desktop\Coursework\CSE\CSE163\Assignment2\CSE163HW2\Release\CSE163Project2.exe : fatal error LNK1120: 31 unresolved externals
+C:\Users\chunc\Desktop\Coursework\CSE\CSE163\Assignment3\CSE163HW2\Release\CSE163Project2.exe : fatal error LNK1120: 48 unresolved externals

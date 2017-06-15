@@ -1,6 +1,6 @@
-CSE 163 HW2
+CSE 163 Final Project
 Name: Ziqi Gan, Yining Yang
 Email: zigan@ucsd.edu, yiy129@ucsd.edu
 Enviornment: Windows Visual Studio
-How to run: open command line window, run the executable with specified filename and step size
+How to run: open command line window, run the executable with render mode
 Notation: Please run the executable with glew32.dll and glfw3.dll under the same directory
